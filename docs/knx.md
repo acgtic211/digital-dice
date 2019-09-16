@@ -96,3 +96,18 @@ Datapoint Types are especially important for diagnostics, i.e. to enable ETS mon
 * 29.x - 64 Bit signed value, e.g., Active Energy, Apparent energy
 * 229.001 - M-Bus metering value, with the various M-Bus VIF/VIFE codings
 * 232.x - RGB color value
+
+### Example KNX Request with Wotnectivity library
+
+In the next fragment of code we are going to see how to make a call to get the status of a KNX light device where the group address is 2/0/1 and the data type is 1.001 (true or false).
+
+```Java
+        KnxReq kr = new KnxReq();
+        String address = "example.server.address";
+        try {
+            System.out.println(kr.getStatus(address, "2/0/1", "1.001"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+```
+If we change the data type for other subtypes of the requested family we will recieve other values but with the same meaning (e.g. "1.002", on or off). In case that we use a different family, and exception will be thrown. 
