@@ -23,22 +23,15 @@ A Group Address has a data length of 16 bit. In a telegram, a Group Address is d
 The so called Group Address structure correlates with its representation style in ETS, see also the relevant ETS Professional article. The information about the ETS Group Address representation style itself is NOT included in the Group Address.
 
 1. '3-level' = main/middle/sub
-   * main = D7+D6+D5+D4+D3 of the first octet (high address)
-   * middle = D2+D1+D0 of the first octet (high address)
-   * sub = the entire second octet (low address)
    * ranges: main = 0..31, middle = 0..7, sub = 0..255
 2. '2-level' = main/sub
-   * main = D7+D6+D5+D4+D3 of the first octet (high address)
-   * sub = D2+D1+D0 of the first octet (high address) + the entire second octet (low address)
    * ranges: main = 0..31, sub = 0..2047
+
+Every group address and functionality can be programed with ETS5.
 
 ### Rules
 
-There is actually only one rule: a Group Address cannot be zero. For an ETS project with 3-level representation this means that '0/0/0' is not allowed and for 2-level that '0/0' is not allowed.
-
-### Limitations
-
-First generation devices didn't support the full 16-bit Group Address range, i.e. D7 = 0, the consequence for an ETS project with 2 or 3-level representation: the range of 'main' = 0..15.
+There is actually only one rule: a Group Address cannot be zero.
 
 ## Datapoint Type
 

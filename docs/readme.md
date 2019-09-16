@@ -2,7 +2,7 @@
 
 ## Common Communication Protocols
 
-### Zigbee - Zwave [link](zigbee-zwave.md)
+### Zigbee - Zwave - Lutron [link](zigbee-zwave.md)
 Depends on the gateway used to control the devices. Until now we are studying 2 models of gateways (Hopefully avaliable in Europe).
 
 * Wink Hub 2 - ![https://winkapiv2.docs.apiary.io/#reference/device/desired-state-and-last-reading] <--- Looks good.
