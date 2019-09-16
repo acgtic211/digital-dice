@@ -170,7 +170,7 @@ Body
 |fan_speed|	float|	0 - 1|
 |mode	|string|	"cool_only", "fan_only", "auto_eco"|
 |powered|	boolean|	whether or not the unit is powered on|
-|max_set_point|	float	|temperature above which the unit should be cooling
+|max_set_point|	float	|temperature above which the unit should be cooling|
 
 #### Last Reading Attributes
 
@@ -180,4 +180,4 @@ Body
 |temperature|	float|	maps to ambient temperature last read from device itself|
 |consumption|	float|	total consumption in watts
 
-if you want a thorough understanding of more types of devices please go to the help page of [Wink API](https://winkapiv2.docs.apiary.io/#reference).
+If you want a thorough understanding of more types of devices please go to the help page of [Wink API](https://winkapiv2.docs.apiary.io/#reference).
