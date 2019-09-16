@@ -110,4 +110,6 @@ In the next fragment of code we are going to see how to make a call to get the s
             e.printStackTrace();
         }
 ```
-If we change the data type for other subtypes of the requested family we will recieve other values but with the same meaning (e.g. "1.002", on or off). In case that we use a different family, and exception will be thrown. 
+If we change the data type for other subtypes of the requested family we will recieve other values but with the same meaning (e.g. "1.002", on or off). In case that we use a different family, and exception will be thrown.
+
+To see all the different sub-types used by KNX specification see ![here](./resources/KNX-Datapoint_Types_v1.5.00_AS.pdf)
