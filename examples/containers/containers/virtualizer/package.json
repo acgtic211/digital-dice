@@ -1,0 +1,26 @@
+{
+  "name": "container-virtualizer",
+  "version": "1.0.0",
+  "description": "Container virtualizer for an IIOT scenario",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "keywords": [
+    "iiot",
+    "dd",
+    "virtualizer",
+    "digital-dice"
+  ],
+  "author": "Tesifón Robles - Manel Mena",
+  "license": "MIT",
+  "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.3.1",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.9.25",
+    "spdy": "^4.0.2"
+  }
+}

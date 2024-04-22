@@ -1,0 +1,27 @@
+{
+  "name": "container-reflection",
+  "version": "1.0.0",
+  "description": "Reflection for the containers",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon ./src/index.js"
+  },
+  "keywords": [
+    "Reflection",
+    "Digital",
+    "Dice",
+    "Digital",
+    "Twin",
+    "IoT",
+    "WoT",
+    "IIOT"
+  ],
+  "author": "Manel Mena - Tesifon Robles",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "dotenv": "^8.2.0",
+    "mongoose": "^5.9.25"
+  }
+}

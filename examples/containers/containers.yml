@@ -1,0 +1,239 @@
+#Containers
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dd-garbage-containers-controller
+  namespace: dd-garbage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dd-garbage-containers-controller
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '443'
+      labels:
+        app: dd-garbage-containers-controller
+    spec:
+      containers:
+      - name: dd-garbage-containers-controller
+        image: dd-garbage-containers-controller:latest
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 250m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dd-garbage-containers-controller-entrypoint
+  namespace: dd-garbage
+spec:
+  type: NodePort
+  selector:
+    app: dd-garbage-containers-controller
+  ports:
+  - port: 443
+    targetPort: 443
+    nodePort: 30001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dd-garbage-containers-dh
+  namespace: dd-garbage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dd-garbage-containers-dh
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '443'
+      labels:
+        app: dd-garbage-containers-dh
+    spec:
+      containers:
+      - name: dd-garbage-containers-dh
+        image: dd-garbage-containers-dh:latest
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 250m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dd-garbage-containers-dh-entrypoint
+  namespace: dd-garbage
+spec:
+  selector:
+    app: dd-garbage-containers-dh
+  ports:
+  - protocol: TCP
+    port: 443
+    targetPort: 443
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dd-garbage-containers-eh
+  namespace: dd-garbage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dd-garbage-containers-eh
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '443'
+      labels:
+        app: dd-garbage-containers-eh
+    spec:
+      containers:
+      - name: dd-garbage-containers-eh
+        image: dd-garbage-containers-eh:latest
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 250m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dd-garbage-containers-eh-entrypoint
+  namespace: dd-garbage
+spec:
+  selector:
+    app: dd-garbage-containers-eh
+  ports:
+  - protocol: TCP
+    port: 443
+    targetPort: 443
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dd-garbage-containers-reflection
+  namespace: dd-garbage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dd-garbage-containers-reflection
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '443'
+      labels:
+        app: dd-garbage-containers-reflection
+    spec:
+      containers:
+      - name: dd-garbage-containers-reflection
+        image: dd-garbage-containers-reflection:latest
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 250m
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dd-garbage-containers-virtualizer
+  namespace: dd-garbage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dd-garbage-containers-virtualizer
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '443'
+      labels:
+        app: dd-garbage-containers-virtualizer
+    spec:
+      containers:
+      - name: dd-garbage-containers-virtualizer
+        image: dd-garbage-containers-virtualizer:latest
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 250m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dd-garbage-containers-virtualizer-entrypoint
+  namespace: dd-garbage
+spec:
+  selector:
+    app: dd-garbage-containers-virtualizer
+  ports:
+  - protocol: TCP
+    port: 443
+    targetPort: 443
+  type: ClusterIP
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: dd-garbage-containers-controller
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: dd-garbage-containers-controller
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: dd-garbage-containers-dh
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: dd-garbage-containers-dh
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
