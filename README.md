@@ -1,5 +1,25 @@
-# Garbage-IIoT experimental scenario
-Experimental scenario of a garbage recollection service using DD.
+# Digital Dice Actualización
+## Adecuación a requisitos de SoftwareX
+### Cambios en el software
+
+1. [ ] Despliegue de mongoDB replicaset en Kubernetes
+2. [x] Establecimiento de configuración de infraestructura y artefactos Kubernetes
+3. [ ] Configuración de variables de entorno para Digital Dice en Kubernetes configmap. Incluida TD de dispositivo a manejar.
+4. [ ] Generación de secretos para Digital Dice en Kubernetes. Incluidos cerfificados SSL auto-firmados. Documentación de como generarlos y añadir excepciones en el navegador.
+5. [ ] Configuración de Ingress para Digital Dice en instalación local de Kubernetes.
+6. [ ] Establecimiento de rutas de manera automática a partir de la TD.
+7. [ ] Generación de comportamiento default para Digital Dice virtualizados en caso de que no haya virtualBehaviour.
+8. [ ] Generación de TD del Digital Dice automática a partir de la TD del dispositivo.
+9. [ ] Generación de OpenAPI a partir de la TD del Digital Dice.
+10. [ ] Establecimiento de UI en los ejemplos del repo.
+11. [ ] Establecimiento de 3 ejemplos (simpleLight, container, maletín) para desplegar en el repo. Los dos primeros virtualizados y el último no.
+12. [ ] Generación de documentación del repo.
+13. [x] Agregar licencia MIT al repo.
+14. [ ] Liberación del repo en GitHub.
+15. [ ] Redacción de publicación en SoftwareX. Cuidado limitaciones: 3000 palabras y 6 figuras max.
+16. [ ] Revisión de la publicación por parte de los autores.
+17. [ ] Envío de la publicación a SoftwareX.
+
 
 ## Requirements
 
