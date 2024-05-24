@@ -1,7 +1,6 @@
 # Digital Dice Actualización
 ## Adecuación a requisitos de SoftwareX
 ### Cambios en el software
-
 1. [ ] Despliegue de mongoDB replicaset en Kubernetes
 2. [x] Establecimiento de configuración de infraestructura y artefactos Kubernetes
 3. [ ] Configuración de variables de entorno para Digital Dice en Kubernetes configmap. Incluida TD de dispositivo a manejar.
