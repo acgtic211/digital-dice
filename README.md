@@ -1,7 +1,8 @@
 # Digital Dice Actualización
 ## Adecuación a requisitos de SoftwareX
 ### Cambios en el software
-1. [ ] Despliegue de mongoDB replicaset en Kubernetes
+1. [ ] Despliegue de mongoDB replicaset en Kubernetes (NO!!!, ver next).
+1. [x] Prueba con mongo atlas para facilitar el despliegue.
 2. [x] Establecimiento de configuración de infraestructura y artefactos Kubernetes
 3. [ ] Configuración de variables de entorno para Digital Dice en Kubernetes configmap. Incluida TD de dispositivo a manejar.
 4. [ ] Generación de secretos para Digital Dice en Kubernetes. Incluidos cerfificados SSL auto-firmados. Documentación de como generarlos y añadir excepciones en el navegador.
@@ -26,7 +27,7 @@ To execute the different scenarios, you need to have installed the following sof
 
 1. Docker.
 2. Kubernetes.
-3. MongoDB as a replica set.
+3. Free account of MongoAtlas. [https://www.mongodb.com/atlas](https://www.mongodb.com/atlas)
 
 ## Replicating the scenario
 First you need to adjust the parameters inside the `.env.example` and rename them to `.env`. Then build the docker image for each of the components of the scenario. Those components are inside the folders:
