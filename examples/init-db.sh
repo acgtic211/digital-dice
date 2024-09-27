@@ -6,10 +6,10 @@ kubectl apply -f mongo-v7.yaml
 
 # Dar tiempo para que los pods se inicien
 echo "Esperando a que los pods de MongoDB se inicien..."
-sleep 60  # Ajusta el tiempo según sea necesario
+sleep 30  # Ajusta el tiempo según sea necesario
 
 # Iniciar el replicaset en el pod mongo-0
-echo "Iniciando el replicaset en MongoDB..."
+echo "Iniciando el replicaset y configurando MongoDB..."
 kubectl exec mongo-0 -- mongosh --eval '
 rs.initiate({
   _id: "rs0",
@@ -21,18 +21,25 @@ rs.initiate({
 });
 '
 
-# Esperar un momento para que se configure el replicaset
+# Esperar un tiempo para que el replicaset se configure
 echo "Esperando a que el replicaset se configure..."
-sleep 10
+sleep 20  # Asegúrate de darle tiempo suficiente al replicaset para formarse
 
-# Comprobar el estado del replicaset
-echo "Comprobando el estado del replicaset..."
-kubectl exec mongo-0 -- mongosh --eval "rs.status()"
+# Verificar si el nodo está en estado PRIMARY antes de continuar
+REPLICA_STATUS=$(kubectl exec mongo-0 -- mongosh --quiet --eval 'rs.status().members.find(m => m.self).stateStr')
+
+while [[ "$REPLICA_STATUS" != "PRIMARY" ]]; do
+    echo "El nodo aún no es PRIMARY, esperando..."
+    sleep 5
+    REPLICA_STATUS=$(kubectl exec mongo-0 -- mongosh --quiet --eval 'rs.status().members.find(m => m.self).stateStr')
+done
+
+echo "El nodo es PRIMARY. Creando la base de datos y los usuarios..."
 
 # Crear las bases de datos y los usuarios
-echo "Creando la base de datos virtual-interactions y el usuario..."
+echo "Creando la base de datos 'virtual-interactions' y el usuario..."
 kubectl exec mongo-0 -- mongosh --eval '
-use virtual-interactions
+db = db.getSiblingDB("virtual-interactions");
 db.createUser({
   user: "virtual-user",
   pwd: "123456virtual",
@@ -40,12 +47,12 @@ db.createUser({
 });
 '
 
-echo "Creando la base de datos dd-db y el usuario..."
+echo "Creando la base de datos 'dd-db' y el usuario..."
 kubectl exec mongo-0 -- mongosh --eval '
-use dd-db
+db = db.getSiblingDB("dd-db");
 db.createUser({
-  user: "dd_admin",
-  pwd: "123456admin",
+  user: "dd-user",
+  pwd: "ddpassword",
   roles: [ "readWrite", "dbAdmin" ]
 });
 '
