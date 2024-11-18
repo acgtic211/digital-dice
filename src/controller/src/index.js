@@ -11,6 +11,9 @@ var request = require('request');
 const EventSource = require('eventsource');
 const spdy = require("spdy");
 //const Ajv = require('ajv');
+//modificacion 18-11-24
+const swaggerUi = require('swagger-ui-express');
+const swaggerJSDoc = require('swagger-jsdoc');
 
 var td = require("./td/td");
 var td_schema = require("./td/td_schema");
@@ -45,6 +48,124 @@ app.use(metricsMiddleware);
 
 // Apply logs template to express
 app.use(morgan('common'));
+
+
+//modificacion 18-11-24
+// Función para convertir TD a OpenAPI
+function generateOpenAPI(td) {
+    const openAPISpec = {
+        openapi: '3.0.0',
+        info: {
+            title: td.title,
+            version: '1.0.0',
+            description: `Generated OpenAPI documentation for ${td.title}`
+        },
+        paths: {},
+        components: {
+            schemas: {}
+        }
+    };
+
+    // Convertir propiedades de TD a endpoints
+    if (td.properties) {
+        for (const [key, prop] of Object.entries(td.properties)) {
+            const propertyPath = `/${td.id}/property/${key}`;
+            openAPISpec.paths[propertyPath] = {
+                get: {
+                    summary: `Get ${key}`,
+                    operationId: `get_${key}`,
+                    responses: {
+                        200: {
+                            description: `Property ${key}`,
+                            content: {
+                                'application/json': {
+                                    schema: prop
+                                }
+                            }
+                        }
+                    }
+                },
+                post: {
+                    summary: `Set ${key}`,
+                    operationId: `set_${key}`,
+                    requestBody: {
+                        required: true,
+                        content: {
+                            'application/json': {
+                                schema: prop
+                            }
+                        }
+                    },
+                    responses: {
+                        200: {
+                            description: `Property ${key} updated`
+                        }
+                    }
+                }
+            };
+        }
+    }
+
+    // Convertir acciones de TD a endpoints
+    if (td.actions) {
+        for (const [key, action] of Object.entries(td.actions)) {
+            const actionPath = `/${td.id}/action/${key}`;
+            openAPISpec.paths[actionPath] = {
+                post: {
+                    summary: `Invoke action ${key}`,
+                    operationId: `invoke_${key}`,
+                    requestBody: {
+                        required: true,
+                        content: {
+                            'application/json': {
+                                schema: action.input
+                            }
+                        }
+                    },
+                    responses: {
+                        200: {
+                            description: `Action ${key} executed`
+                        }
+                    }
+                }
+            };
+        }
+    }
+
+    // Convertir eventos de TD a endpoints (si los hay)
+    if (td.events) {
+        for (const [key] of Object.entries(td.events)) {
+            const eventPath = `/event/${key}`;
+            openAPISpec.paths[eventPath] = {
+                get: {
+                    summary: `Subscribe to event ${key}`,
+                    operationId: `subscribe_${key}`,
+                    responses: {
+                        200: {
+                            description: `Subscribed to event ${key}`
+                        }
+                    }
+                }
+            };
+        }
+    }
+
+    return openAPISpec;
+}
+
+const openAPISpec = generateOpenAPI(td);
+
+app.use('/' + td.id, swaggerUi.serve, swaggerUi.setup(openAPISpec, {
+    customCss: '.swagger-ui .topbar { display: none }', 
+    customSiteTitle: td.title                           
+}));
+
+app.get('/openapi.json', (req, res) => {
+    res.json(openAPISpec);
+});
+
+console.log("Swagger UI disponible en /api-docs");
+console.log("Esquema OpenAPI disponible en /openapi.json");
 
 app.get('/', async (req, res)=>{
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
