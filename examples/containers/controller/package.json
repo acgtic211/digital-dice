@@ -17,6 +17,7 @@
   "author": "Manel Mena",
   "license": "MIT",
   "dependencies": {
+    "containers-controller": "file:",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "eventsource": "^1.1.0",

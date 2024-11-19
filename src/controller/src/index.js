@@ -179,7 +179,7 @@ app.get('/acg:lab:suitcase-dd/status/sse', async (req, res) => {
 
     console.log("FUNCIONA PLS");
     var eventSourceInitDict = {https: {rejectUnauthorized: false}};
-    var es = new EventSource("https://dd-suitcase-dh-entrypoint:8063/acg:lab:suitcase-dd/status/sse", eventSourceInitDict);
+    var es = new EventSource(process.env.DH + ":8063/acg:lab:suitcase-dd/status/sse", eventSourceInitDict);
     //var es = new EventSource("https://localhost:8063"+"/"+td.id+"/property/"+req.params.propertyName+"/sse", eventSourceInitDict);
     //request("http://localhost:8063"+"/"+td.id+"/property/"+req.params.propertyName+"/sse").pipe(res);
 
@@ -212,7 +212,7 @@ app.get('/'+td.id+'/property/:propertyName/sse', async (req, res) => {
     if(!td.properties[req.params.propertyName]) res.status(404).send("That property doesn't exist");
 
     var eventSourceInitDict = {https: {rejectUnauthorized: false}};
-    var es = new EventSource("https://dd-suitcase-dh-entrypoint:8063"+"/"+td.id+"/property/"+req.params.propertyName+"/sse", eventSourceInitDict);
+    var es = new EventSource(process.env.DH + ":8063"+"/"+td.id+"/property/"+req.params.propertyName+"/sse", eventSourceInitDict);
     //var es = new EventSource("https://localhost:8063"+"/"+td.id+"/property/"+req.params.propertyName+"/sse", eventSourceInitDict);
     //request("http://localhost:8063"+"/"+td.id+"/property/"+req.params.propertyName+"/sse").pipe(res);
 
@@ -245,7 +245,7 @@ app.get('/'+td.id+'/property/:propertyName', async (req, res) => {
 
     res.writeHead(200, headers);
 
-    request("https://dd-suitcase-dh-entrypoint:8063"+"/"+td.id+"/property/"+req.params.propertyName).pipe(res);
+    request(process.env.DH + ":8063"+"/"+td.id+"/property/"+req.params.propertyName).pipe(res);
     //request("https://localhost:8063"+"/"+td.id+"/property/"+req.params.propertyName).pipe(res);
 
 })
@@ -266,7 +266,7 @@ app.post('/'+td.id+'/property/:propertyName', async (req, res) => {
 
     res.writeHead(200, headers);
     //var reqProp = await wotnectivity.sendRequest(process.env.SUITCASE_URI, { requestType: "write", group: "2/0/0", dataType: "DPT1.001" }, req.body.value);
-    request.post("https://dd-suitcase-dh-entrypoint:8063"+"/"+td.id+"/property/"+req.params.propertyName, {"json":req.body}).pipe(res)
+    request.post(process.env.DH + ":8063"+"/"+td.id+"/property/"+req.params.propertyName, {"json":req.body}).pipe(res)
     //request.post("https://localhost:8063"+"/"+td.id+"/property/"+req.params.propertyName, {"json":req.body}).pipe(res)
 
 
@@ -290,7 +290,7 @@ app.post('/'+td.id+'/action/:actionName', async (req, res) => {
 
     //var reqProp = await wotnectivity.sendRequest(process.env.SUITCASE_URI, { requestType: "write", group: "2/0/0", dataType: "DPT1.001" }, req.body.value);
 
-    request.post("https://dd-suitcase-dh-entrypoint:8063"+"/"+td.id+"/action/"+req.params.actionName,{"json":req.body}).pipe(res);
+    request.post(process.env.DH + ":8063"+"/"+td.id+"/action/"+req.params.actionName,{"json":req.body}).pipe(res);
     //request.post("https://localhost:8063"+"/"+td.id+"/action/"+req.params.actionName,{"json":req.body}).pipe(res);
 
 
@@ -308,7 +308,7 @@ app.get('/event/:eventName', async (req, res) => {
 
     res.writeHead(200, headers);
     
-    res.redirect("https://dd-suitcase-eh-entrypoint:8064"+"/"+td.id+"/event/"+req.params.eventName)
+    res.redirect(process.env.EH + ":8064"+"/"+td.id+"/event/"+req.params.eventName)
 
 
 })
