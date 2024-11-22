@@ -163,13 +163,13 @@ app.post('/' + td.id + '/event/:eventName', async (req, res) => {
 // Initializates the Webserver
 spdy.createServer(
     {
-        key: fs.readFileSync("./privkey.pem"),
-        cert: fs.readFileSync("./fullchain.pem")
+        key: fs.readFileSync("/app/certs/privkey.pem"),
+        cert: fs.readFileSync("/app/certs/fullchain.pem")
     },
     app
-  ).listen(process.env.PORT, (err) => {
+  ).listen(process.env.PORT_DH, (err) => {
     if(err){
       throw new Error(err)
     }
-    console.log("Listening on port "+ process.env.PORT)
+    console.log("Listening on port "+ process.env.PORT_DH)
 })

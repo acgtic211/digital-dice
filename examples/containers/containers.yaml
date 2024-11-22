@@ -1,4 +1,28 @@
-#Containers
+apiVersion: v1
+kind: Secret
+metadata:
+  name: googlemaps-secret
+type: Opaque
+data:
+  GOOGLE_MAPS_API_KEY: QUl6YVN5QkpHRHBZd3R4Z3dOQXpqYmZlZHV1d01VUVB0eEpYLUlN
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: containers-config
+data:
+  PORT: "443"
+  EH: "https://dd-garbage-containers-eh-entrypoint"
+  DH: "https://dd-garbage-containers-dh-entrypoint"
+  VIRTUALIZER: "https://dd-garbage-containers-virtualizer-entrypoint"
+  DB_NAME: "virtual-interactions"
+  DB_USER: "virtual-user"
+  DB_PASS: "123456virtual"
+  DB_NAME_TI: "dd-db"
+  DB_USER_TI: "dd_admin"
+  DB_PASS_TI: "123456admin"
+  DB_URI: "mongodb://mongo-0.mongo-headless.default:27017,mongo-1.mongo-headless.default:27017,mongo-2.mongo-headless.default:27017/"
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -24,6 +48,17 @@ spec:
         resources:
           limits:
             cpu: 100m
+        envFrom:
+          - configMapRef:
+              name: containers-config
+        volumeMounts:
+          - name: tls-containers
+            mountPath: "/app/certs"
+            readOnly: true
+      volumes:
+          - name: tls-containers
+            secret:
+              secretName: tls-containers
 ---
 apiVersion: v1
 kind: Service
@@ -63,6 +98,17 @@ spec:
         resources:
           limits:
             cpu: 100m
+        envFrom:
+          - configMapRef:
+              name: containers-config
+        volumeMounts:
+          - name: tls-containers
+            mountPath: "/app/certs"
+            readOnly: true
+      volumes:
+          - name: tls-containers
+            secret:
+              secretName: tls-containers
 ---
 apiVersion: v1
 kind: Service
@@ -102,6 +148,17 @@ spec:
         resources:
           limits:
             cpu: 100m
+        envFrom:
+          - configMapRef:
+              name: containers-config
+        volumeMounts:
+          - name: tls-containers
+            mountPath: "/app/certs"
+            readOnly: true
+      volumes:
+          - name: tls-containers
+            secret:
+              secretName: tls-containers
 ---
 apiVersion: v1
 kind: Service
@@ -141,6 +198,17 @@ spec:
         resources:
           limits:
             cpu: 100m
+        envFrom:
+          - configMapRef:
+              name: containers-config
+        volumeMounts:
+          - name: tls-containers
+            mountPath: "/app/certs"
+            readOnly: true
+      volumes:
+          - name: tls-containers
+            secret:
+              secretName: tls-containers
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -167,6 +235,23 @@ spec:
         resources:
           limits:
             cpu: 100m
+        env:
+          - name: GOOGLE_MAPS_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: googlemaps-secret
+                key: GOOGLE_MAPS_API_KEY
+        envFrom:
+          - configMapRef:
+              name: containers-config
+        volumeMounts:
+          - name: tls-containers
+            mountPath: "/app/certs"
+            readOnly: true
+      volumes:
+          - name: tls-containers
+            secret:
+              secretName: tls-containers
 ---
 apiVersion: v1
 kind: Service

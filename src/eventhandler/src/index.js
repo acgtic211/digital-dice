@@ -52,23 +52,26 @@ app.get('/'+td.title+'/event/:eventName',async (req, res)=>{
 })
 async function effectsControl(){
     var causes=[[]];
-    var effectsKeys = Object.keys(td.effects)
-    console.log(effectsKeys)
-    effectsKeys.forEach((key,effectIndex)=>{
+    if (td.effects)  {
+        var effectsKeys = Object.keys(td.effects) 
         
-            td.effects[key].causes.forEach((cause, causeIndex)=>{
-                console.log("CausesIn")
-                ThingInteraction.watch([{$match: {$and: [  { "fullDocument.origen": "physicalDevice"}, {"fullDocument.interaction": cause.interactionType+"."+cause.interaction }]}}]).on('change', async change => {
-                    causes[effectIndex][causeIndex]=change.fullDocument;
-                    console.log("interaction watched")
-                    if(td.effects[key].window){
-                        var inWindow = await calcWindow(causes[effectIndex], td.effects[key])
-                        console.log(inWindow);
-                        if(inWindow) evalExpresion(causes[effectIndex], td.effects[key])
-                    }
-                })
+        console.log(effectsKeys)
+        effectsKeys.forEach((key,effectIndex)=>{
+            
+                td.effects[key].causes.forEach((cause, causeIndex)=>{
+                    console.log("CausesIn")
+                    ThingInteraction.watch([{$match: {$and: [  { "fullDocument.origen": "physicalDevice"}, {"fullDocument.interaction": cause.interactionType+"."+cause.interaction }]}}]).on('change', async change => {
+                        causes[effectIndex][causeIndex]=change.fullDocument;
+                        console.log("interaction watched")
+                        if(td.effects[key].window){
+                            var inWindow = await calcWindow(causes[effectIndex], td.effects[key])
+                            console.log(inWindow);
+                            if(inWindow) evalExpresion(causes[effectIndex], td.effects[key])
+                        }
+                    })
+                });
             });
-        });
+    }
     
 }
 
@@ -108,6 +111,6 @@ async function evalExpresion(causes, effect){
 
 effectsControl();
 
-app.listen(process.env.PORT, () => {
-    console.debug('App listening on port ' + process.env.PORT);
+app.listen(process.env.PORT_EH, () => {
+    console.debug('App listening on port ' + process.env.PORT_EH);
 });
