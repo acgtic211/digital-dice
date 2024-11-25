@@ -315,21 +315,21 @@ app.get('/event/:eventName', async (req, res) => {
 
 
 
-app.listen(process.env.PORT2, () => {
-    console.log('Controller listening on port ', process.env.PORT2);
+app.listen(process.env.PORT2_CONTROLLER, () => {
+    console.log('Controller listening on port ', process.env.PORT2_CONTROLLER);
 });
 
 spdy.createServer(
     {
-        key: fs.readFileSync("./privkey.pem"),
-        cert: fs.readFileSync("./fullchain.pem")
+        key: fs.readFileSync("/app/certs/privkey.pem"),
+        cert: fs.readFileSync("/app/certs/fullchain.pem")
     },
     app
-  ).listen(process.env.PORT, (err) => {
+  ).listen(process.env.PORT_CONTROLLER, (err) => {
     if(err){
       throw new Error(err)
     }
-    console.log("Listening on port "+ process.env.PORT)
+    console.log("Listening on port "+ process.env.PORT_CONTROLLER)
 })
 
 const options = {
