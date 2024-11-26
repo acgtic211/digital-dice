@@ -46,6 +46,7 @@ db.createUser({
   roles: [ "readWrite", "dbAdmin" ]
 });
 db.virtualCollection.insertOne({ name: "primer documento" });
+db.containers.insertOne({ name: "primer contenedor", status: "activo" });
 ' 
 
 # Crear la base de datos 'dd-db' y el usuario

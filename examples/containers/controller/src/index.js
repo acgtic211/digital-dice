@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const promBundle = require("express-prom-bundle");
 const fs = require("fs")
+const path = require("path")
 const metricsMiddleware = promBundle({includeMethod: true});
 //var http = require('http');
 var request = require('request');
@@ -33,6 +34,10 @@ app.use(metricsMiddleware);
 
 // Apply logs template to express
 app.use(morgan('common'));
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 app.get('/acg:lab:virtual-containers/td', async (req, res) => {
 
