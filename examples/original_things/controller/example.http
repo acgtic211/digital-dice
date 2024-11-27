@@ -1,0 +1,73 @@
+###
+GET https://localhost:30001/acg:lab:suitcase-dd/ HTTP/1.1
+content-type: application/json
+
+###
+GET https://wot-lab.com/acg:lab:suitcase-dd/property/luminosity-dimmer1 HTTP/1.1
+content-type: application/json
+
+###
+GET http://localhost:30001/light1/property/memem HTTP/1.1
+content-type: application/json
+
+
+###
+POST https://localhost:8062/acg:lab:suitcase-dd/property/status-light1 HTTP/1.1
+content-type: application/json
+
+{
+    "value": false
+}
+
+###
+
+POST http://localhost:8062/acg:lab:suitcase-dd/property/status-light1 HTTP/1.1
+content-type: application/json
+
+{
+    "value": false
+}
+
+###
+
+POST https://localhost:8062/acg:lab:suitcase-dd/action/switch-light1 HTTP/2
+content-type: application/json
+
+{
+    "value": true
+}
+
+###
+
+POST http://localhost:8062/acg:lab:suitcase-dd/action/switch-light1 HTTP/1.1
+content-type: application/json
+
+{
+    "value": true
+}
+
+###
+
+POST http://localhost:8062/acg:lab:suitcase-dd/action/switch-light2 HTTP/1.1
+content-type: application/json
+
+{
+    "value": false
+}
+
+###
+
+POST http://localhost:30001/acg:lab:suitcase-dd/action/switch-fire HTTP/1.1
+content-type: application/json
+
+{
+    "value": false
+}
+
+###
+POST https://wot-lab.com/acg:lab:suitcase-dd/property/luminosity-dimmer1 HTTP/1.1
+content-type: application/json
+
+{
+    "brightness": 0
+}
