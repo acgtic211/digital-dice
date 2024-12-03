@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  controller:
+    image: node:18
+    container_name: suitcase-controller
+    working_dir: /app
+    volumes:
+      - ./controller:/app
+      - /app/node_modules
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - PORT=80
+      - PORT2_CONTROLLER=443
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+      - DH=http://database:27017
+      - EH=http://eventhandler:8064
+    command: sh -c "npm install && node src/index.js"
+    depends_on:
+      - database
+      - eventhandler
+
+  virtualizer:
+    image: node:18
+    container_name: suitcase-virtualizer
+    working_dir: /app
+    volumes:
+      - ./virtualizer:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+      - DH=http://database:27017
+    command: sh -c "npm install && node app.js"
+    depends_on:
+      - database
+
+  eventhandler:
+    image: node:18
+    container_name: suitcase-eventhandler
+    working_dir: /app
+    volumes:
+      - ./eventhandler:/app
+      - /app/node_modules
+    ports:
+      - "8064:8064"
+    environment:
+      - PORT=8064
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+      - DH=http://database:27017
+    command: sh -c "npm install && node src/index.js"
+    depends_on:
+      - database
