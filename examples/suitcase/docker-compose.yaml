@@ -2,56 +2,77 @@ version: '3.8'
 
 services:
   controller:
-    image: node:18
-    container_name: suitcase-controller
-    working_dir: /app
+    build:
+      context: ./controller
+      dockerfile: Dockerfile
+    container_name: controller
     volumes:
-      - ./controller:/app
-      - /app/node_modules
+      - ./certs:/usr/src/app/certs
     ports:
-      - "80:80"
-      - "443:443"
+      - "1480:80"
+      - "14443:443"
     environment:
-      - PORT=80
-      - PORT2_CONTROLLER=443
-      - NODE_TLS_REJECT_UNAUTHORIZED=0
-      - DH=http://database:27017
-      - EH=http://eventhandler:8064
-    command: sh -c "npm install && node src/index.js"
+      - PORT_CONTROLLER=443
+      - PORT2_CONTROLLER=80
+      - PORT_DH=8063
+      - PORT_EH=8064
+      - DEVICE_URI=192.168.1.38
+      - DH=https://dh
+      - EH=https://eh
+      - DB_NAME=dd-db
+      - DB_USER=dd_admin
+      - DB_PASS=123456admin
+      - DB_PORT=27071
+      - DB_HOST=192.168.1.2
+      - DB_URI=mongodb://192.168.1.2:27071/
     depends_on:
-      - database
-      - eventhandler
+      - dh
+      - eh
 
-  virtualizer:
-    image: node:18
-    container_name: suitcase-virtualizer
-    working_dir: /app
+  dh:
+    build:
+      context: ./datahandler
+      dockerfile: Dockerfile
+    container_name: dh
     volumes:
-      - ./virtualizer:/app
-      - /app/node_modules
+      - ./certs:/usr/src/app/certs
     ports:
-      - "3000:3000"
+      - "8063:443"
     environment:
-      - PORT=3000
-      - NODE_TLS_REJECT_UNAUTHORIZED=0
-      - DH=http://database:27017
-    command: sh -c "npm install && node app.js"
-    depends_on:
-      - database
+      - PORT_CONTROLLER=443
+      - PORT2_CONTROLLER=80
+      - PORT_DH=8063
+      - PORT_EH=8064
+      - DEVICE_URI=192.168.1.38
+      - DH=https://dh
+      - EH=https://eh
+      - DB_NAME=dd-db
+      - DB_USER=dd_admin
+      - DB_PASS=123456admin
+      - DB_PORT=27071
+      - DB_HOST=192.168.1.2
+      - DB_URI=mongodb://192.168.1.2:27071/
 
-  eventhandler:
-    image: node:18
-    container_name: suitcase-eventhandler
-    working_dir: /app
+  eh:
+    build:
+      context: ./eventhandler
+      dockerfile: Dockerfile
+    container_name: eh
     volumes:
-      - ./eventhandler:/app
-      - /app/node_modules
+      - ./certs:/usr/src/app/certs
     ports:
-      - "8064:8064"
+      - "8064:443"
     environment:
-      - PORT=8064
-      - NODE_TLS_REJECT_UNAUTHORIZED=0
-      - DH=http://database:27017
-    command: sh -c "npm install && node src/index.js"
-    depends_on:
-      - database
+      - PORT_CONTROLLER=443
+      - PORT2_CONTROLLER=80
+      - PORT_DH=8063
+      - PORT_EH=8064
+      - DEVICE_URI=192.168.1.38
+      - DH=https://dh
+      - EH=https://eh
+      - DB_NAME=dd-db
+      - DB_USER=dd_admin
+      - DB_PASS=123456admin
+      - DB_PORT=27071
+      - DB_HOST=192.168.1.2
+      - DB_URI=mongodb://192.168.1.2:27071/
