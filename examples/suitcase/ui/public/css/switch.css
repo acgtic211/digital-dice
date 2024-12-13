@@ -1,0 +1,71 @@
+.switchLabel {
+    font-size: 16px;
+    font-weight: bold;
+    font-family: "Montserrat", "Arial", sans-serif;
+}
+
+.switchContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+    gap: 10px;
+}
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 120px;
+    height: 68px;
+    background-color: rgba(46, 48, 56, 0.5);
+    border-radius: 34px; /* Border radius for the overall switch */
+    transition: background-color 0.4s;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(46, 48, 56, 0.5);
+    border-radius: 34px; /* Ensures the box itself is rounded */
+    transition: 0.4s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.slider:before {
+    position: absolute;
+    content: "OFF";
+    height: 56px; /* Set the height of the ball */
+    width: 56px; /* Set the width of the ball */
+    left: 6px; /* Adjusted from 6px */
+    background-color: #DF6451;
+    font-weight: 700;
+    color: white;
+    border-radius: 50%; /* This makes the ball circular */
+    text-align: center;
+    line-height: 56px; /* Vertically centers the text inside the ball */
+    font-family: Arial, sans-serif; /* Cambia la fuente a Arial */
+    transition: .4s;
+}
+
+/* Change to "ON" when checked */
+input:checked + .slider:before {
+    transform: translateX(52px);
+    content: "ON";
+    background-color: #35BC7A;
+}
