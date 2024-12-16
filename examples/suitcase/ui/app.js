@@ -16,11 +16,11 @@ app.get('/', (req, res) => {
 // Ruta para el componente Switch (con un label y acción DELETE personalizada)
 app.get('/switch', (req, res) => {
   const switchLabel = "SWITCH 2";
-  const requestUrl = "https://acg.ual.es/things/acg:lab:suitcase-dd/"; // URL para hacer la petición
+  const requestUrl = "a"; // URL para hacer la petición
   const imageSrc = "/assets/WaterSwitch.png";  // Imagen para el switch
-  const property = "status-light2";
+  const action = "switch-light2";
   // Usar la función del componente Switch
-  const component = switchComponent(switchLabel, requestUrl, property, imageSrc);
+  const component = switchComponent(switchLabel, requestUrl, action, imageSrc);
   res.send(`
     <html>
       <head>
@@ -36,7 +36,7 @@ app.get('/switch', (req, res) => {
 // Ruta para el componente Dimmer (con acción POST personalizada)
 app.get('/dimmer', (req, res) => {
   const knobLabel = "KNOB 1";
-  const requestUrl = "https://acg.ual.es/things/acg:lab:suitcase-dd/"; // URL para hacer la petición
+  const requestUrl = "a"; // URL para hacer la petición
   const property = "status-light1";
   
   // Usar la función del componente Dimmer
@@ -55,33 +55,53 @@ app.get('/dimmer', (req, res) => {
 
 // Ruta para mostrar múltiples componentes
 app.get('/multiple-components', (req, res) => {
-  const requestUrl = "https://acg.ual.es/things/acg:lab:suitcase-dd/"; // URL para hacer la petición
+  const requestUrl = "a"; // URL para hacer la petición
 
-  const switch1 = switchComponent("SWITCH 1", requestUrl, "status-light1", "/assets/Switch1.png");
-  const switch2 = switchComponent("SWITCH 2", requestUrl, "status-light2", "/assets/Switch2.png");
-  const switchFire = switchComponent("FIRE SWITCH", requestUrl, "status-light1", "/assets/Fireswitch.png");
-  const switchWater = switchComponent("WATER SWITCH", requestUrl, "status-light1", "/assets/WaterSwitch.png");
+  const switch1 = switchComponent("SWITCH 1", requestUrl, "switch-light1", "/assets/Switch1.png");
+  const switch2 = switchComponent("SWITCH 2", requestUrl, "switch-light2", "/assets/Switch2.png");
+  const switchFire = switchComponent("FIRE SWITCH", requestUrl, "switch-fire", "/assets/Fireswitch.png");
+  const switchWater = switchComponent("WATER SWITCH", requestUrl, "switch-water", "/assets/WaterSwitch.png");
 
-  const dimmerHTML = dimmerComponent("dimmerUrl");
+  const dimmer1 = dimmerComponent("DIMMER 1", requestUrl, "switch-dimmer1", "luminosity-dimmer1");
+  const dimmer2 = dimmerComponent("DIMMER 2", requestUrl, "switch-dimmer2", "luminosity-dimmer2");
   
   res.send(`
     <html>
       <head>
         <link rel="stylesheet" type="text/css" href="/css/switch.css">  
         <link rel="stylesheet" type="text/css" href="/css/dimmer.css">  
+        <link rel="stylesheet" type="text/css" href="/css/suitcase.css"> 
       </head>
       <body>
-        ${switch1}
-        ${switch2}
-        ${switchFire}
-        ${switchWater}
-        ${dimmerHTML}
+        <div class="suitcaseContainer">
+          <div class="knxScenarioContainer">
+            <div class="switchesContainer">
+              <div class="switchC">${switch1}</div>
+              <div class="switchC">${switch2}</div>
+              <div class="switchC">${switchFire}</div>
+              <div class="switchC">${switchWater}</div>
+            </div>
+            <div class="slidersContainer">
+              ${dimmer1}
+              ${dimmer2}
+            </div>
+          </div>
+        </div>
       </body>
     </html>
   `);
 });
 
-// Iniciar servidor
-app.listen(3000, () => {
-  console.log('Servidor en http://localhost:3000');
-});
+
+spdy.createServer(
+  {
+      key: fs.readFileSync("/usr/src/app/certs/privkey.pem"),
+      cert: fs.readFileSync("/usr/src/app/certs/fullchain.pem")
+  },
+  app
+).listen(process.env.PORT_UI, (err) => {
+  if(err){
+    throw new Error(err)
+  }
+  console.log("Listening on port "+ process.env.PORT_UI)
+})

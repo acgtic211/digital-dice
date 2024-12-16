@@ -1,0 +1,66 @@
+.suitcaseContainer {
+    display: flex;
+    height: 100%;
+    max-width: 1150px;
+  }
+
+.knxScenarioContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+  }
+
+
+  .slidersContainer {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    margin-top: 3rem;
+    width: 100%;
+    gap: 40px;
+  }
+
+  .switchesContainer {
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(200px, 1fr));
+    place-items: center;
+    width: 100%;
+  }
+
+  .switchC {
+    width: 140px; /* Tamaño fijo para los switchers */
+    height: 168px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    border-radius: 34px;
+}
+
+
+@media screen and (max-width: 768px) {
+    .suitcaseContainer {
+      gap: 20px;
+    }
+  
+    .knxScenarioContainer {
+      padding: 1rem;
+    }
+  
+    .slidersContainer {
+      gap: 20px;
+    }
+  
+    .switchesContainer {
+      grid-template-columns: repeat(1, minmax(200px, 1fr));
+      gap: 20px;
+    }
+  
+    .switchC {
+      width: 100%;
+      height: 168px;
+    }
+    
+}
