@@ -2,9 +2,7 @@ version: '3.8'
 
 services:
   controller:
-    build:
-      context: ./controller
-      dockerfile: Dockerfile
+    image: manelme/digital-dice:s.dd.c.02
     container_name: controller
     volumes:
       - ./certs:/usr/src/app/certs
@@ -30,9 +28,7 @@ services:
       - eh
 
   dh:
-    build:
-      context: ./datahandler
-      dockerfile: Dockerfile
+    image: manelme/digital-dice:s.dd.dh.02
     container_name: dh
     volumes:
       - ./certs:/usr/src/app/certs
@@ -54,9 +50,7 @@ services:
       - DB_URI=mongodb://192.168.1.2:27071/
 
   eh:
-    build:
-      context: ./eventhandler
-      dockerfile: Dockerfile
+    image: manelme/digital-dice:s.dd.eh.02
     container_name: eh
     volumes:
       - ./certs:/usr/src/app/certs
@@ -76,3 +70,11 @@ services:
       - DB_PORT=27071
       - DB_HOST=192.168.1.2
       - DB_URI=mongodb://192.168.1.2:27071/
+  ui:
+    image: manelme/digital-dice:s.dd.ui.02
+    container_name: ui
+    ports:
+      - "8065:443"
+    environment:
+      - PORT_UI=8065
+  
