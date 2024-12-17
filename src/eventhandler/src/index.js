@@ -51,6 +51,11 @@ app.get('/'+td.title+'/event/:eventName',async (req, res)=>{
 
 })
 async function effectsControl(){
+    if (!td || !td.effects) {
+        console.error("td or td.effects is not defined");
+        return;
+    }
+
     var causes=[[]];
     var effectsKeys = Object.keys(td.effects)
     console.log(effectsKeys)
