@@ -1,5 +1,7 @@
 FROM node:lts-alpine
 
+RUN echo "0ad9203"
+
 # Create app directory
 WORKDIR /usr/src/app
 
@@ -17,4 +19,4 @@ COPY . .
 
 EXPOSE 80
 EXPOSE 443
-CMD [ "node", "src/index.js" ]
+CMD [ "node", "src/app.js" ]
