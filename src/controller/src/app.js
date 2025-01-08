@@ -7,36 +7,32 @@ const promBundle = require("express-prom-bundle");
 const fs = require("fs");
 const path = require('path');
 const metricsMiddleware = promBundle({ includeMethod: true });
+const https = require("https");
 const http = require("http");
 const Ajv = require("ajv");
 
 const routes = require("./routes");
-const swaggerConfig = require("./swaggerConfig");
+const swaggerUi = require("swagger-ui-express");
+const { openAPISpec }= require("./swaggerConfig");
 
-dotenv.config();
-
-// Ruta al archivo JSON
 const jsonFilePath = path.join(__dirname, 'td', 'originalTd.json');
 
-// Leer el archivo JSON de manera síncrona
-let td;
 try {
   const data = fs.readFileSync(jsonFilePath, 'utf8');
-  td = JSON.parse(data);
+  var td = JSON.parse(data);
 } catch (err) {
   console.error('Error reading or parsing JSON file:', err);
-  process.exit(1); // Salir del proceso si hay un error al leer o parsear el archivo JSON
 }
 
-const td_schema = require("./td/td_schema");
+var td_schema = require("./td/td_schema");
 
 // Validate TD.
-const ajv = new Ajv();
-const valid = ajv.validate(td_schema, td);
+
+var ajv = new Ajv();
+var valid = ajv.validate(td_schema, td);
 if (!valid) {
   console.log(ajv.errors);
-  console.log("La Thing no cumple el esquema de la Thing Description");
-  process.exit(1); // Salir del proceso si la validación falla
+  console.log("La Thing no cumple el equema de la Thing Description");
 } else {
   console.log("TD validada");
 
@@ -46,13 +42,13 @@ if (!valid) {
     basic_sc: {
       scheme: "basic",
       in: "header",
-    },
+     }
   };
 
   td.security = "basic_sc";
 
   if (td.properties) {
-    for (const prop in td.properties) {
+    for (var prop in td.properties) {
       if (td.properties.hasOwnProperty(prop)) {
         td.properties[prop].forms = [
           {
@@ -72,7 +68,7 @@ if (!valid) {
   }
 
   if (td.actions) {
-    for (const action in td.actions) {
+    for (var action in td.actions) {
       if (td.actions.hasOwnProperty(action)) {
         td.actions[action].forms = [
           {
@@ -86,7 +82,7 @@ if (!valid) {
   }
 
   if (td.events) {
-    for (const event in td.events) {
+    for (var event in td.events) {
       if (td.events.hasOwnProperty(event)) {
         td.events[event].forms = [
           {
@@ -110,6 +106,8 @@ if (!valid) {
   process.env.TD_VIRTUAL = JSON.stringify(td);
 }
 
+dotenv.config();
+
 // Creates Web Server
 const app = express();
 
@@ -131,30 +129,34 @@ app.use("/", routes);
 
 app.use(
   "/api_docs",
-  swaggerConfig.swaggerUi.serve,
-  swaggerConfig.swaggerUi.setup(swaggerConfig.openAPISpec, {
+  swaggerUi.serve,
+  swaggerUi.setup(openAPISpec, {
     customCss: ".swagger-ui .topbar { display: none }",
-    customSiteTitle: swaggerConfig.td.title,
   })
 );
 app.get("/openapi.json", (req, res) => {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-  res.json(swaggerConfig.openAPISpec);
+  res.json(openAPISpec);
 });
-
-console.log("Swagger UI disponible en /api-docs");
-console.log("Esquema OpenAPI disponible en /openapi.json");
 
 app.listen(process.env.PORT2_CONTROLLER, () => {
   console.log("Controller listening on port ", process.env.PORT2_CONTROLLER);
 });
 
-http.createServer(app).listen(process.env.PORT_CONTROLLER, (err) => {
-  if (err) {
-    throw new Error(err);
-  }
-  console.log("Listening on port " + process.env.PORT_CONTROLLER);
-});
+https
+  .createServer(
+    {
+      key: fs.readFileSync("/app/certs/privkey.pem"),
+      cert: fs.readFileSync("/app/certs/fullchain.pem"),
+    },
+    app
+  )
+  .listen(process.env.PORT_CONTROLLER, (err) => {
+    if (err) {
+      throw new Error(err);
+    }
+    console.log("Listening on port " + process.env.PORT_CONTROLLER);
+  });
 
 const options = {
   hostname: "acg.ual.es",

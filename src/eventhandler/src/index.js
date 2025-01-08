@@ -113,6 +113,6 @@ async function evalExpresion(causes, effect){
 
 effectsControl();
 
-app.listen(process.env.PORT, () => {
-    console.debug('App listening on port ' + process.env.PORT);
+app.listen(process.env.PORT_EH, () => {
+    console.debug('App listening on port ' + process.env.PORT_EH);
 });

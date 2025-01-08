@@ -2,7 +2,16 @@ const express = require("express");
 const EventSource = require("eventsource");
 const request = require("request");
 const router = express.Router();
-const { td } = require("./swaggerConfig");
+const fs = require("fs");
+const path = require('path');
+const jsonFilePath = path.join(__dirname, 'td', 'originalTd.json');
+
+try {
+  const data = fs.readFileSync(jsonFilePath, 'utf8');
+  var td = JSON.parse(data);
+} catch (err) {
+  console.error('Error reading or parsing JSON file:', err);
+}
 
 router.get("/", (req, res) => {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
