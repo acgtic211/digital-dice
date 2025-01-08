@@ -51,6 +51,11 @@ app.get('/'+td.title+'/event/:eventName',async (req, res)=>{
 
 })
 async function effectsControl(){
+    if (!td.effects) {
+        console.error("td.effects is not defined");
+        return;
+    }
+
     var causes=[[]];
     var effectsKeys = Object.keys(td.effects)
     console.log(effectsKeys)
@@ -108,6 +113,6 @@ async function evalExpresion(causes, effect){
 
 effectsControl();
 
-app.listen(process.env.PORT, () => {
-    console.debug('App listening on port ' + process.env.PORT);
+app.listen(process.env.PORT_EH, () => {
+    console.debug('App listening on port ' + process.env.PORT_EH);
 });
