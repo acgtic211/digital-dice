@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const promBundle = require("express-prom-bundle");
 const fs = require("fs")
+const path = require("path")
 const metricsMiddleware = promBundle({includeMethod: true});
 //var http = require('http');
 var request = require('request');
@@ -34,6 +35,10 @@ app.use(metricsMiddleware);
 // Apply logs template to express
 app.use(morgan('common'));
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 app.get('/acg:lab:virtual-containers/td', async (req, res) => {
 
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
@@ -52,7 +57,7 @@ app.get('/acg:lab:virtual-containers/events/fire/sse', async(req, res) => {
     };
     
     var eventSourceInitDict = { https: {rejectUnauthorized: false}};
-    var es = new EventSource('https://dd-garbage-containers-eh-entrypoint:443/acg:lab:virtual-containers/events/fire/sse', eventSourceInitDict);
+    var es = new EventSource(process.env.EH + ':' + process.env.PORT + '/acg:lab:virtual-containers/events/fire/sse', eventSourceInitDict);
     console.log(es);
     res.writeHead(200, headers);
 
@@ -72,7 +77,7 @@ app.get('/acg:lab:virtual-containers/events/fire/sse', async(req, res) => {
 app.get('/acg:lab:virtual-containers/property/containersDetails', async (req, res) => {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
-    request('https://dd-garbage-containers-dh-entrypoint:443/acg:lab:virtual-containers/property/containersDetails').pipe(res);
+    request(process.env.DH + ':' + process.env.PORT + '/acg:lab:virtual-containers/property/containersDetails').pipe(res);
 
 });
 
@@ -80,7 +85,7 @@ app.get('/acg:lab:virtual-containers/property/containersDetails', async (req, re
 app.get('/acg:lab:virtual-containers/:serialNumber/property/containerDetails', async(req, res) => {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
     
-    request('https://dd-garbage-containers-dh-entrypoint:443/acg:lab:virtual-containers/' + req.params.serialNumber + '/property/containerDetails').pipe(res);
+    request(process.env.DH + ':' + process.env.PORT + '/acg:lab:virtual-containers/' + req.params.serialNumber + '/property/containerDetails').pipe(res);
 
 });
 
@@ -90,7 +95,7 @@ app.get('/acg:lab:virtual-containers/property/containersDetails/sse', async (req
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
     var eventSourceInitDict = { https: {rejectUnauthorized: false}};
-    var es = new EventSource('https://dd-garbage-containers-dh-entrypoint:443/acg:lab:virtual-containers/property/containersDetails/sse', eventSourceInitDict);
+    var es = new EventSource(process.env.DH + ':' + process.env.PORT + '/acg:lab:virtual-containers/property/containersDetails/sse', eventSourceInitDict);
 
     const headers = {
         'Content-Type': 'text/event-stream',
@@ -122,7 +127,7 @@ app.get('/acg:lab:virtual-containers/:serialNumber/property/containerDetails/sse
     res.writeHead(200, headers);
 
     var eventSourceInitDict = { https: {rejectUnauthorized: false}};
-    var es = new EventSource('https://dd-garbage-containers-dh-entrypoint:443/acg:lab:virtual-containers/' + req.params.serialNumber + '/property/containerDetails/sse', eventSourceInitDict);
+    var es = new EventSource(process.env.DH + ':' + process.env.PORT + '/acg:lab:virtual-containers/' + req.params.serialNumber + '/property/containerDetails/sse', eventSourceInitDict);
     
     es.onmessage = function(event) {
         console.log(JSON.stringify(event.data));
@@ -147,20 +152,20 @@ app.put('/acg:lab:virtual-containers/:serialNumber/actions/:actionName', async(r
         });
     }
 
-    request.put('https://dd-garbage-containers-dh-entrypoint:443/acg:lab:virtual-containers/' + req.params.serialNumber + '/action/' + req.params.actionName, {"json": req.body }).pipe(res);
+    request.put(process.env.DH + ':' + process.env.PORT + '/acg:lab:virtual-containers/' + req.params.serialNumber + '/action/' + req.params.actionName, {"json": req.body }).pipe(res);
 
 });
 
 app.put('/acg:lab:virtual-containers/runApp', async(req, res) => {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-    request.put('https://dd-garbage-containers-virtualizer-entrypoint:443/containers/runApp').pipe(res);
+    request.put(process.env.VIRTUALIZER + ':' + process.env.PORT + '/containers/runApp').pipe(res);
 });
 
 
 spdy.createServer(
     {
-      key: fs.readFileSync("./server.key"),
-      cert: fs.readFileSync("./server.crt")
+      key: fs.readFileSync("/app/certs/server.key"),
+      cert: fs.readFileSync("/app/certs/server.crt")
     },
     app
   ).listen(process.env.PORT, (err) => {

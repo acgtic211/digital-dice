@@ -188,8 +188,8 @@ fire();
 
 spdy.createServer(
     {
-      key: fs.readFileSync("./server.key"),
-      cert: fs.readFileSync("./server.crt")
+      key: fs.readFileSync("/app/certs/server.key"),
+      cert: fs.readFileSync("/app/certs/server.crt")
     },
     app
   ).listen(process.env.PORT, (err) => {

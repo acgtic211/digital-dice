@@ -1,7 +1,5 @@
 FROM node:lts-alpine
 
-RUN echo "hfdai"
-
 # Create app directory
 WORKDIR /usr/src/app
 

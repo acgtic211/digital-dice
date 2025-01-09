@@ -2,6 +2,11 @@
 echo "##### BUILDEANDO CONTROLLER #####"
 cd controller
 docker build -t dd-garbage-containers-controller .
+
+kubectl create secret generic tls-containers \
+  --from-file=server.crt=server.crt \
+  --from-file=server.key=server.key
+
 echo "##### BUILDEANDO DATAHANDLER #####"
 cd ../datahandler
 docker build -t dd-garbage-containers-dh .
