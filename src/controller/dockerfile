@@ -1,7 +1,5 @@
 FROM node:lts-alpine
 
-RUN echo "ayudaa"
-
 # Create app directory
 WORKDIR /usr/src/app
 
