@@ -13,7 +13,7 @@ data:
   DB_NAME: "dd-db"
   DB_USER: "dd_admin"
   DB_PASS: "123456admin"
-  DB_URI: "mongodb://mongo-0.mongo-headless.default:27017,mongo-1.mongo-headless.default:27017,mongo-2.mongo-headless.default:27017/"
+  DB_URI: "mongodb://192.168.1.2:27071/"
   TD_O_URL: "https://example.com"
 ---
 apiVersion: apps/v1
@@ -112,8 +112,8 @@ spec:
     app: src-dh
   ports:
   - protocol: TCP
-    port: 443
-    targetPort: 443
+    port: 8063
+    targetPort: 8063
   type: ClusterIP
 ---
 apiVersion: apps/v1
@@ -162,8 +162,8 @@ spec:
     app: src-eh
   ports:
   - protocol: TCP
-    port: 443
-    targetPort: 443
+    port: 8064
+    targetPort: 8064
   type: ClusterIP
 ---
 apiVersion: apps/v1

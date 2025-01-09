@@ -321,8 +321,8 @@ app.listen(process.env.PORT2_CONTROLLER, () => {
 
 spdy.createServer(
     {
-        key: fs.readFileSync("/app/certs/privkey.pem"),
-        cert: fs.readFileSync("/app/certs/fullchain.pem")
+        key: fs.readFileSync("./privkey.pem"),
+        cert: fs.readFileSync("./fullchain.pem")
     },
     app
   ).listen(process.env.PORT_CONTROLLER, (err) => {
