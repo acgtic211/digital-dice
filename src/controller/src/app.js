@@ -1,23 +1,29 @@
-const express = require('express');
-const morgan = require('morgan');
-const dotenv = require('dotenv');
-const bodyParser = require('body-parser');
+const express = require("express");
+const morgan = require("morgan");
+const dotenv = require("dotenv");
+const bodyParser = require("body-parser");
+const cors = require("cors");
 const promBundle = require("express-prom-bundle");
-const fs = require("fs")
-const cors = require('cors');
-const Ajv = require('ajv');
-const metricsMiddleware = promBundle({includeMethod: true});
-
-const spdy = require("spdy");
+const fs = require("fs");
+const path = require('path');
+const metricsMiddleware = promBundle({ includeMethod: true });
+const https = require("https");
+const http = require("http");
+const Ajv = require("ajv");
 
 const routes = require("./routes");
+const swaggerUi = require("swagger-ui-express");
+const { openAPISpec }= require("./swaggerConfig");
+
+const jsonFilePath = path.join(__dirname, 'td', 'originalTd.json');
 
 try {
-const data = fs.readFileSync(jsonFilePath, 'utf8');
-var td = JSON.parse(data);
+  const data = fs.readFileSync(jsonFilePath, 'utf8');
+  var td = JSON.parse(data);
 } catch (err) {
-console.error('Error reading or parsing JSON file:', err);
+  console.error('Error reading or parsing JSON file:', err);
 }
+
 var td_schema = require("./td/td_schema");
 
 // Validate TD.
@@ -109,31 +115,69 @@ const app = express();
 app.use(cors());
 
 // parse application/json
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(metricsMiddleware);
 
 // Apply logs template to express
-app.use(morgan('common'));
-
-
-
+app.use(morgan("common"));
 
 app.use("/", routes);
 
-// Initializates the Webserver
-spdy.createServer(
+app.use(
+  `/docs/${td.id}`,
+  swaggerUi.serve,
+  swaggerUi.setup(openAPISpec, {
+    customCss: ".swagger-ui .topbar { display: none }",
+  })
+);
+app.get("/docs/openapi-json", (req, res) => {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+  res.json(openAPISpec);
+});
+
+app.listen(process.env.PORT2_CONTROLLER, () => {
+  console.log("Controller listening on port ", process.env.PORT2_CONTROLLER);
+});
+
+https
+  .createServer(
     {
-        key: fs.readFileSync("/app/certs/privkey.pem"),
-        cert: fs.readFileSync("/app/certs/fullchain.pem")
+      key: fs.readFileSync("/app/certs/privkey.pem"),
+      cert: fs.readFileSync("/app/certs/fullchain.pem"),
     },
     app
-  ).listen(process.env.PORT_DH, (err) => {
-    if(err){
-      throw new Error(err)
+  )
+  .listen(process.env.PORT_CONTROLLER, (err) => {
+    if (err) {
+      throw new Error(err);
     }
-    console.log("Listening on port "+ process.env.PORT_DH)
-})
+    console.log("Listening on port " + process.env.PORT_CONTROLLER);
+  });
+
+const options = {
+  hostname: "acg.ual.es",
+  path: "/projects/cosmart/wot-lab/ds/",
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+};
+
+const req = http.request(options, (res) => {
+  console.log(`statusCode: ${res.statusCode}`);
+
+  res.on("data", (d) => {
+    process.stdout.write(d);
+  });
+});
+
+req.on("error", (error) => {
+  console.error(error);
+});
+
+req.write(JSON.stringify(td));
+req.end();
