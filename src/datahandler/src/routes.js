@@ -30,7 +30,7 @@ router.get('/' + td.id + '/status/sse', async (req, res) => {
   res.writeHead(200, headers);
   console.log("HELLOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
 
-  ThingInteraction.watch([{$match: {$and: [  { "fullDocument.origen": "physicalDevice"}, {"fullDocument.device": "acg:lab:suitcase-dd" }]}}]).on('change', change => {
+  ThingInteraction.watch([{$match: {$and: [  { "fullDocument.origen": "physicalDevice"}, {"fullDocument.device": td.id }]}}]).on('change', change => {
       var response = new ThingInteraction(change.fullDocument);
       res.write(`data: ${JSON.stringify(response)}\n\n`)
   });
@@ -65,14 +65,26 @@ router.get('/' + td.id + '/property/:propertyName/sse', async (req, res) => {
 })
 
 router.get('/' + td.id + '/property/:propertyName', async (req, res) => {
+  const { origin } = req.query;
 
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
-  ThingInteraction.findOne({ interaction: "property."+req.params.propertyName, origen: "physicalDevice" }, {}, { sort: { 'createdAt': -1 } }, function (err, data) {
+  if (origin === "physicalDevice") {
+  ThingInteraction.findOne({ interaction: "property."+req.params.propertyName, origen: "physicalDevice", device: td.id }, {}, { sort: { 'createdAt': -1 } }, function (err, data) {
       var response = new ThingInteraction(data);
       res.send(response.data)
   });
-
+  } else if (origin === "user") {
+      ThingInteraction.findOne({ interaction: "property."+req.params.propertyName, origen: "user", device: td.id }, {}, { sort: { 'createdAt': -1 } }, function (err, data) {
+          var response = new ThingInteraction(data);
+          res.send(response.data)
+      });
+  } else {
+    ThingInteraction.findOne({ interaction: "property."+req.params.propertyName, device: td.id }, {}, { sort: { 'createdAt': -1 } }, function (err, data) {
+      var response = new ThingInteraction(data);
+      res.send(response.data)
+  });
+  }
 })
 
 router.post('/' + td.id + '/property/:propertyName', async (req, res) => {
@@ -80,7 +92,7 @@ router.post('/' + td.id + '/property/:propertyName', async (req, res) => {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
   var interactionValue = new ThingInteraction({
-      device: "acg:lab:suitcase-dd",
+      device: td.id,
       origen: "user",
       interaction: "property." + req.params.propertyName,
       data: req.body
@@ -100,7 +112,7 @@ router.post('/' + td.id + '/action/:actionName', async (req, res) => {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
   var interactionValue = new ThingInteraction({
-      device: "acg:lab:suitcase-dd",
+      device: td.id,
       origen: "user",
       interaction: "action." + req.params.actionName,
       data: req.body
@@ -119,7 +131,7 @@ router.post('/' + td.id + '/event/:eventName', async (req, res) => {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
 
   var interactionValue = new ThingInteraction({
-      device: "acg:lab:suitcase-dd",
+      device: td.id,
       origen: "eventHandler",
       interaction: "event." + req.params.eventName,
       data: req.body

@@ -13,7 +13,7 @@ data:
   DB_NAME: "dd-db"
   DB_USER: "dd_admin"
   DB_PASS: "123456admin"
-  DB_URI: "mongodb://192.168.1.2:27071/"
+  DB_URI: "mongodb://mongo-0.mongo-headless.default:27017,mongo-1.mongo-headless.default:27017,mongo-2.mongo-headless.default:27017/"
   TD_O_URL: "https://example.com"
 ---
 apiVersion: apps/v1

@@ -102,9 +102,6 @@ async function calcWindow(causes, effect){
         if(effect.window-Math.abs(timeBetween)>0 && effect.window-Math.abs(timeBetween)<effect.window) return true;
     }
     return false;
-
-6
-
 }
 
 async function evalExpresion(causes, effect){
