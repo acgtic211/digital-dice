@@ -3,14 +3,17 @@ const morgan = require('morgan');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const promBundle = require("express-prom-bundle");
-const fs = require("fs")
+const fs = require("fs");
 const cors = require('cors');
 const Ajv = require('ajv');
 const metricsMiddleware = promBundle({includeMethod: true});
+const path = require('path');
 
 const spdy = require("spdy");
 
 const routes = require("./routes");
+
+const jsonFilePath = path.join('/app/td', 'originalTd.json');
 
 try {
 const data = fs.readFileSync(jsonFilePath, 'utf8');

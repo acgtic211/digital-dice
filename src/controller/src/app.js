@@ -14,8 +14,7 @@ const Ajv = require("ajv");
 const routes = require("./routes");
 const swaggerUi = require("swagger-ui-express");
 const { openAPISpec }= require("./swaggerConfig");
-
-const jsonFilePath = path.join(__dirname, 'td', 'originalTd.json');
+const jsonFilePath = path.join('/app/td', 'originalTd.json');
 
 try {
   const data = fs.readFileSync(jsonFilePath, 'utf8');

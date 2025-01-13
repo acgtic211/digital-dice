@@ -8,9 +8,13 @@ kubectl create secret generic tls-src \
   --from-file=fullchain.pem=fullchain.pem \
   --from-file=server.crt=server.crt \
   --from-file=server.key=server.key
+
+cd ../
+
+kubectl create configmap td-config --from-file=originalTd.json
   
 echo "##### BUILDEANDO DATAHANDLER #####"
-cd ../datahandler
+cd ./datahandler
 docker build -t src-dh .
 echo "##### BUILDEANDO EVENTHANDLER #####"
 cd ../eventhandler

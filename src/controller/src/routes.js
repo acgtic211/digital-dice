@@ -4,7 +4,8 @@ const request = require("request");
 const router = express.Router();
 const fs = require("fs");
 const path = require('path');
-const jsonFilePath = path.join(__dirname, 'td', 'originalTd.json');
+
+const jsonFilePath = path.join('/app/td', 'originalTd.json');
 
 try {
   const data = fs.readFileSync(jsonFilePath, 'utf8');
