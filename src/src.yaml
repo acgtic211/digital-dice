@@ -184,49 +184,6 @@ spec:
     targetPort: 8064
   type: ClusterIP
 ---
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: src-reflection
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: src-reflection
-  template:
-    metadata:
-      annotations:
-        prometheus.io/scrape: 'true'
-        prometheus.io/path: /metrics
-        prometheus.io/port: '443'
-      labels:
-        app: src-reflection
-    spec:
-      containers:
-      - name: src-reflection
-        image: src-reflection:latest
-        imagePullPolicy: IfNotPresent
-        resources:
-          limits:
-            cpu: 100m
-        envFrom:
-          - configMapRef:
-              name: src-config
-        volumeMounts:
-          - name: tls-src
-            mountPath: "/app/certs"
-            readOnly: true
-          - name: td-config
-            mountPath: "/app/td"
-            readOnly: true
-      volumes:
-        - name: tls-src
-          secret:
-            secretName: tls-src
-        - name: td-config
-          configMap:
-            name: td-config
----
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:

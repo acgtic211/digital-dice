@@ -154,9 +154,6 @@ app.use(metricsMiddleware);
 // Apply logs template to express
 app.use(morgan('common'));
 
-
-
-
 app.use("/", routes);
 
 // Initializates the Webserver

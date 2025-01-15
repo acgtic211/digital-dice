@@ -1,7 +1,8 @@
 # Buildeamos las imagenes de los contenedores
-echo "##### BUILDEANDO CONTROLLER #####"
-cd controller
-docker build -t src-controller .
+
+kubectl create configmap td-config --from-file=originalTd.json
+
+cd ./certs
 
 kubectl create secret generic tls-src \
   --from-file=privkey.pem=privkey.pem \
@@ -9,19 +10,18 @@ kubectl create secret generic tls-src \
   --from-file=server.crt=server.crt \
   --from-file=server.key=server.key
 
-cd ../
-
-kubectl create configmap td-config --from-file=originalTd.json
-  
+echo "##### BUILDEANDO CONTROLLER #####"
+cd ../controller
+docker build -t src-controller .
 echo "##### BUILDEANDO DATAHANDLER #####"
-cd ./datahandler
+cd ../datahandler
 docker build -t src-dh .
 echo "##### BUILDEANDO EVENTHANDLER #####"
 cd ../eventhandler
 docker build -t src-eh .
-echo "##### BUILDEANDO REFLECTION #####"
-cd ../reflection
-docker build -t src-reflection .
+# echo "##### BUILDEANDO REFLECTION #####"
+# cd ../reflection
+# docker build -t src-reflection .
 
 # Aplicamos el YAML para iniciar los contenedores
 echo "##### INICIANDO YAML #####"

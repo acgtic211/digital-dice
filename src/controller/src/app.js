@@ -134,6 +134,8 @@ if (!valid) {
   console.log("TD virtual creado:", td);
 
   process.env.TD_VIRTUAL = JSON.stringify(td);
+  console.log("TD virtual en variable de entorno TD_VIRTUAL");
+  console.log(process.env.TD_VIRTUAL);
 }
 
 dotenv.config();
