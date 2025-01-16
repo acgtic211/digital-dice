@@ -1,55 +1,6 @@
-const express = require('express');
-const morgan = require('morgan');
-const dotenv = require('dotenv');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const Ajv = require('ajv');
+const ThingInteraction = require('./models'); // Importar modelo
+const td = require('./tdLoader'); // Importar TD cargado
 
-var td = require("./td/td");
-var td_schema = require("./td/td_schema");
-
-dotenv.config();
-
-// Connect to the mongoDB
-const db = require('./config');
-
-// Creates Web Server
-const app = express();
-
-//Cors
-app.use(cors());
-
-// parse application/json
-app.use(bodyParser.json())
-
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
-
-// Apply logs template to express
-app.use(morgan('common'));
-
-
-var thingInteractionSchema = require('./models')
-
-var ThingInteraction = db.model('ThingInteraction', thingInteractionSchema);
-
-//var td_schema = require("./td/td_schema");
-
-app.get('/'+td.title+'/event/:eventName',async (req, res)=>{
-    const headers = {
-        'Content-Type': 'text/event-stream',
-        'Connection': 'keep-alive',
-        'Cache-Control': 'no-cache'
-    };
-    res.writeHead(200, headers);
-
-    ThingInteraction.watch({interaction: 'property.status'}).on('change', change => res.write(`data: ${JSON.stringify(change.fullDocument)}\n\n`));;
-    
-    req.on('close', () => {
-        console.log(`Connection closed`);
-    });
-
-})
 async function effectsControl(){
     if (!td || !td.effects) {
         console.error("td or td.effects is not defined");
@@ -102,17 +53,10 @@ async function calcWindow(causes, effect){
         if(effect.window-Math.abs(timeBetween)>0 && effect.window-Math.abs(timeBetween)<effect.window) return true;
     }
     return false;
-
-6
-
 }
 
 async function evalExpresion(causes, effect){
     eval(effect.evalExpression);
 }
 
-effectsControl();
-
-app.listen(process.env.PORT_EH, () => {
-    console.debug('App listening on port ' + process.env.PORT_EH);
-});
+module.exports = { effectsControl };

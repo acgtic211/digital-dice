@@ -1,0 +1,47 @@
+const express = require('express');
+const morgan = require('morgan');
+const dotenv = require('dotenv');
+const bodyParser = require('body-parser');
+const promBundle = require("express-prom-bundle");
+const fs = require("fs");
+const cors = require('cors');
+const metricsMiddleware = promBundle({includeMethod: true});
+
+const spdy = require("spdy");
+
+const routes = require("./routes");
+
+dotenv.config();
+
+// Creates Web Server
+const app = express();
+
+//Cors
+app.use(cors());
+
+// parse application/json
+app.use(bodyParser.json())
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+
+app.use(metricsMiddleware);
+
+// Apply logs template to express
+app.use(morgan('common'));
+
+app.use("/", routes);
+
+// Initializates the Webserver
+spdy.createServer(
+    {
+        key: fs.readFileSync("/app/certs/privkey.pem"),
+        cert: fs.readFileSync("/app/certs/fullchain.pem")
+    },
+    app
+  ).listen(process.env.PORT_DH, (err) => {
+    if(err){
+      throw new Error(err)
+    }
+    console.log("Listening on port "+ process.env.PORT_DH)
+})

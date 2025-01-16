@@ -2,16 +2,9 @@ const express = require("express");
 const EventSource = require("eventsource");
 const request = require("request");
 const router = express.Router();
-const fs = require("fs");
-const path = require('path');
-const jsonFilePath = path.join(__dirname, 'td', 'originalTd.json');
-
-try {
-  const data = fs.readFileSync(jsonFilePath, 'utf8');
-  var td = JSON.parse(data);
-} catch (err) {
-  console.error('Error reading or parsing JSON file:', err);
-}
+const swaggerUi = require("swagger-ui-express");
+const { openAPISpec }= require("./swaggerConfig");
+const td = require('./tdLoader');
 
 router.get("/", (req, res) => {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -21,34 +14,6 @@ router.get("/", (req, res) => {
 router.get(`/${td.id}`, (req, res) => {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   res.send(td);
-});
-
-router.get("/acg:lab:suitcase-dd/status/sse", async (req, res) => {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-  //if(!td.properties[req.params.propertyName]) res.status(404).send("That property doesn't exist");
-
-  console.log("FUNCIONA PLS");
-  var eventSourceInitDict = { https: { rejectUnauthorized: false } };
-  var es = new EventSource(
-    process.env.DH + ":8063/acg:lab:suitcase-dd/status/sse",
-    eventSourceInitDict
-  );
-  //var es = new EventSource("https://localhost:8063"+"/"+td.id+"/property/"+req.params.propertyName+"/sse", eventSourceInitDict);
-  //request("http://localhost:8063"+"/"+td.id+"/property/"+req.params.propertyName+"/sse").pipe(res);
-
-  const headers = {
-    "Content-Type": "text/event-stream",
-    Connection: "keep-alive",
-    "Cache-Control": "no-cache",
-  };
-  res.writeHead(200, headers);
-
-  es.onmessage = function (event) {
-    res.write(`data: ${event.data}\n\n`);
-  };
-  req.on("close", () => {
-    console.log(`Connection closed`);
-  });
 });
 
 router.get(`/${td.id}/property/:propertyName/sse`, (req, res) => {
@@ -201,6 +166,19 @@ router.get(`/${td.id}/event/:eventName`, async (req, res) => {
   res.redirect(
     process.env.EH + ":8064" + "/" + td.id + "/event/" + req.params.eventName
   );
+});
+
+router.use(
+  `/docs/${td.id}`,
+  swaggerUi.serve,
+  swaggerUi.setup(openAPISpec, {
+    customCss: ".swagger-ui .topbar { display: none }",
+  })
+);
+
+router.get(`/docs/${td.id}/json`, (req, res) => {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+  res.json(openAPISpec);
 });
 
 module.exports = router;

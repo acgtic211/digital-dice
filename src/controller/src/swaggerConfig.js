@@ -1,17 +1,5 @@
 const swaggerUi = require("swagger-ui-express");
-const fs = require("fs");
-const path = require('path');
-
-const jsonFilePath = path.join(__dirname, 'td', 'originalTd.json');
-
-let td;
-try {
-  const data = fs.readFileSync(jsonFilePath, 'utf8');
-  td = JSON.parse(data);
-} catch (err) {
-  console.error('Error reading or parsing JSON file:', err);
-  process.exit(1); // Salir del proceso si hay un error al leer o parsear el archivo JSON
-}
+const td = require('./tdLoader');
 
 // Función para convertir TD a OpenAPI
 function generateOpenAPI(td) {

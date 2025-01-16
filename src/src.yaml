@@ -3,18 +3,18 @@ kind: ConfigMap
 metadata:
   name: src-config
 data:
-  PORT_CONTROLLER: "443"
-  PORT2_CONTROLLER: "80"
-  PORT_DH: "8063"
-  PORT_EH: "8064"
-  DEVICE_URI: "192.168.1.38"
-  DH: "https://src-dh-entrypoint"
-  EH: "https://src-eh-entrypoint"
-  DB_NAME: "dd-db"
-  DB_USER: "dd_admin"
-  DB_PASS: "123456admin"
-  DB_URI: "mongodb://192.168.1.2:27071/"
-  TD_O_URL: "https://example.com"
+  PORT_CONTROLLER: "443" # Port for the controller
+  PORT2_CONTROLLER: "80" # Alternative port for the controller
+  PORT_DH: "8063" # Port for the datahandler
+  PORT_EH: "8064" # Port for the eventhandler
+  DEVICE_URI: "192.168.1.38" # IP address of the device
+  DH: "https://src-dh-entrypoint" # Datahandler entrypoint
+  EH: "https://src-eh-entrypoint" # Eventhandler entrypoint
+  DB_NAME: "dd-db" # Database name
+  DB_USER: "dd_admin" # Database user
+  DB_PASS: "123456admin" # Database password
+  DB_URI: "mongodb://mongo-0.mongo-headless.default:27017,mongo-1.mongo-headless.default:27017,mongo-2.mongo-headless.default:27017/" # Database URI
+  TD_O_URL: "https://example.com" # URL for the Thing Description
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -48,10 +48,16 @@ spec:
           - name: tls-src
             mountPath: "/app/certs"
             readOnly: true
+          - name: td-config
+            mountPath: "/app/td"
+            readOnly: true
       volumes:
-          - name: tls-src
-            secret:
-              secretName: tls-src
+        - name: tls-src
+          secret:
+            secretName: tls-src
+        - name: td-config
+          configMap:
+            name: td-config
 ---
 apiVersion: v1
 kind: Service
@@ -98,10 +104,16 @@ spec:
           - name: tls-src
             mountPath: "/app/certs"
             readOnly: true
+          - name: td-config
+            mountPath: "/app/td"
+            readOnly: true
       volumes:
-          - name: tls-src
-            secret:
-              secretName: tls-src
+        - name: tls-src
+          secret:
+            secretName: tls-src
+        - name: td-config
+          configMap:
+            name: td-config
 ---
 apiVersion: v1
 kind: Service
@@ -148,10 +160,16 @@ spec:
           - name: tls-src
             mountPath: "/app/certs"
             readOnly: true
+          - name: td-config
+            mountPath: "/app/td"
+            readOnly: true
       volumes:
-          - name: tls-src
-            secret:
-              secretName: tls-src
+        - name: tls-src
+          secret:
+            secretName: tls-src
+        - name: td-config
+          configMap:
+            name: td-config
 ---
 apiVersion: v1
 kind: Service
@@ -165,43 +183,6 @@ spec:
     port: 8064
     targetPort: 8064
   type: ClusterIP
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: src-reflection
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: src-reflection
-  template:
-    metadata:
-      annotations:
-        prometheus.io/scrape: 'true'
-        prometheus.io/path: /metrics
-        prometheus.io/port: '443'
-      labels:
-        app: src-reflection
-    spec:
-      containers:
-      - name: src-reflection
-        image: src-reflection:latest
-        imagePullPolicy: IfNotPresent
-        resources:
-          limits:
-            cpu: 100m
-        envFrom:
-          - configMapRef:
-             name: src-config
-        volumeMounts:
-          - name: tls-src
-            mountPath: "/app/certs"
-            readOnly: true
-      volumes:
-          - name: tls-src
-            secret:
-              secretName: tls-src
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
