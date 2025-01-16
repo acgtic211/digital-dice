@@ -2,6 +2,8 @@ const fs = require("fs");
 const path = require('path');
 const Ajv = require("ajv");
 
+// añadir links openapi y thing description virtual (sustituir td original)
+
 const jsonFilePath = path.join('/app/td', 'originalTd.json');
 
 let td;
@@ -118,6 +120,19 @@ if (!valid) {
       }
     }
   }
+
+  td.links = [
+    {
+      href: `${td.base}/openapi`,
+      rel: "openapi",
+      type: "application/openapi"
+    },
+    {
+      href: `${td.base}/${td.id}`,
+      rel: "self",
+      type: "application/json"
+    }
+  ];
 
   console.log("TD virtual creado en variable de entorno TD_VIRTUAL");
 

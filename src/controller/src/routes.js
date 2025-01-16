@@ -169,16 +169,11 @@ router.get(`/${td.id}/event/:eventName`, async (req, res) => {
 });
 
 router.use(
-  `/docs/${td.id}`,
+  `/openapi`,
   swaggerUi.serve,
   swaggerUi.setup(openAPISpec, {
     customCss: ".swagger-ui .topbar { display: none }",
   })
 );
-
-router.get(`/docs/${td.id}/json`, (req, res) => {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-  res.json(openAPISpec);
-});
 
 module.exports = router;
