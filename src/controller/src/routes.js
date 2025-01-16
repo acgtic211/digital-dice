@@ -2,48 +2,9 @@ const express = require("express");
 const EventSource = require("eventsource");
 const request = require("request");
 const router = express.Router();
-const fs = require("fs");
-const path = require('path');
-
-const jsonFilePath = path.join('/app/td', 'originalTd.json');
-
-let td;
-
-try {
-  // Comprueba si el archivo existe y tiene contenido antes de leerlo
-  const stats = fs.statSync(jsonFilePath);
-
-  if (stats.size === 0) {
-    console.error('Error: El archivo originalTd.json está vacío (sin texto)');
-    process.exit(1);
-  }
-
-  const data = fs.readFileSync(jsonFilePath, 'utf8');
-
-  // Verifica si el contenido leído es vacío o solo tiene espacios en blanco
-  if (!data || data.trim() === "") {
-    console.error('Error: El archivo originalTd.json contiene solo espacios en blanco o está vacío');
-    process.exit(1);
-  }
-
-  td = JSON.parse(data);
-
-  // Verifica si el objeto JSON está vacío
-  if (Object.keys(td).length === 0) {
-    console.error('Error: El contenido del TD está vacío');
-    process.exit(1);
-  }
-
-} catch (err) {
-  console.error('Error leyendo o parseando el archivo JSON:', err);
-  process.exit(1);
-}
-
-// Validación del TD.
-if (!td) {
-  console.error('Error: El TD es nulo o indefinido');
-  process.exit(1);
-}
+const swaggerUi = require("swagger-ui-express");
+const { openAPISpec }= require("./swaggerConfig");
+const td = require('./tdLoader');
 
 router.get("/", (req, res) => {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
@@ -205,6 +166,19 @@ router.get(`/${td.id}/event/:eventName`, async (req, res) => {
   res.redirect(
     process.env.EH + ":8064" + "/" + td.id + "/event/" + req.params.eventName
   );
+});
+
+router.use(
+  `/docs/${td.id}`,
+  swaggerUi.serve,
+  swaggerUi.setup(openAPISpec, {
+    customCss: ".swagger-ui .topbar { display: none }",
+  })
+);
+
+router.get(`/docs/${td.id}/json`, (req, res) => {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+  res.json(openAPISpec);
 });
 
 module.exports = router;
