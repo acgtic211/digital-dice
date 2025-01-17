@@ -1,0 +1,223 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: src-config
+data:
+  PORT_CONTROLLER: "443" # Port for the controller
+  PORT2_CONTROLLER: "80" # Alternative port for the controller
+  PORT_DH: "8063" # Port for the datahandler
+  PORT_EH: "8064" # Port for the eventhandler
+  DEVICE_URI: "192.168.1.38" # IP address of the device
+  DH: "https://src-dh-entrypoint" # Datahandler entrypoint
+  EH: "https://src-eh-entrypoint" # Eventhandler entrypoint
+  DB_NAME: "dd-db" # Database name
+  DB_USER: "dd_admin" # Database user
+  DB_PASS: "123456admin" # Database password
+  DB_URI: "mongodb://192.168.1.2:27071/" # Database URI
+  TD_O_URL: "https://example.com" # URL for the Thing Description
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: src-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: src-controller
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '443'
+      labels:
+        app: src-controller
+    spec:
+      containers:
+      - name: src-controller
+        image: manelme/digital-dice-controller:0.1.0
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 100m
+        envFrom:
+          - configMapRef:
+              name: src-config
+        volumeMounts:
+          - name: tls-src
+            mountPath: "/app/certs"
+            readOnly: true
+          - name: td-config
+            mountPath: "/app/td"
+            readOnly: true
+      volumes:
+        - name: tls-src
+          secret:
+            secretName: tls-src
+        - name: td-config
+          configMap:
+            name: td-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: src-controller-entrypoint
+spec:
+  type: NodePort
+  selector:
+    app: src-controller
+  ports:
+  - port: 443
+    targetPort: 443
+    nodePort: 30001
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: src-dh
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: src-dh
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '443'
+      labels:
+        app: src-dh
+    spec:
+      containers:
+      - name: src-dh
+        image: manelme/digital-dice-dh:0.1.0
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 100m
+        envFrom:
+          - configMapRef:
+              name: src-config
+        volumeMounts:
+          - name: tls-src
+            mountPath: "/app/certs"
+            readOnly: true
+          - name: td-config
+            mountPath: "/app/td"
+            readOnly: true
+      volumes:
+        - name: tls-src
+          secret:
+            secretName: tls-src
+        - name: td-config
+          configMap:
+            name: td-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: src-dh-entrypoint
+spec:
+  selector:
+    app: src-dh
+  ports:
+  - protocol: TCP
+    port: 8063
+    targetPort: 8063
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: src-eh
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: src-eh
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '443'
+      labels:
+        app: src-eh
+    spec:
+      containers:
+      - name: src-eh
+        image: manelme/digital-dice-eh:0.1.0
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 100m
+        envFrom:
+          - configMapRef:
+              name: src-config
+        volumeMounts:
+          - name: tls-src
+            mountPath: "/app/certs"
+            readOnly: true
+          - name: td-config
+            mountPath: "/app/td"
+            readOnly: true
+      volumes:
+        - name: tls-src
+          secret:
+            secretName: tls-src
+        - name: td-config
+          configMap:
+            name: td-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: src-eh-entrypoint
+spec:
+  selector:
+    app: src-eh
+  ports:
+  - protocol: TCP
+    port: 8064
+    targetPort: 8064
+  type: ClusterIP
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: src-controller
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: src-controller
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: src-dh
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: src-dh
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
