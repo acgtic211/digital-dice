@@ -128,8 +128,8 @@ if (!valid) {
       type: "application/openapi"
     },
     {
-      href: `${td.base}/${td.id}`,
-      rel: "self",
+      href: `${td.base}/`,
+      rel: "thing-description",
       type: "application/json"
     }
   ];
