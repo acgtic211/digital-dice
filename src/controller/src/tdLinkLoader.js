@@ -4,7 +4,7 @@ const Ajv = require("ajv");
 
 // añadir links openapi y thing description virtual (sustituir td original)
 
-const jsonFilePath = path.join('/app/td', 'originalTd.json');
+const jsonFilePath = path.join('/app/td', 'td.json');
 
 let td;
 
@@ -13,7 +13,7 @@ try {
   const stats = fs.statSync(jsonFilePath);
 
   if (stats.size === 0) {
-    console.error('Error: El archivo originalTd.json está vacío (sin texto)');
+    console.error('Error: El archivo td.json está vacío (sin texto)');
     process.exit(1);
   }
 
@@ -21,7 +21,7 @@ try {
 
   // Verifica si el contenido leído es vacío o solo tiene espacios en blanco
   if (!data || data.trim() === "") {
-    console.error('Error: El archivo originalTd.json contiene solo espacios en blanco o está vacío');
+    console.error('Error: El archivo td.json contiene solo espacios en blanco o está vacío');
     process.exit(1);
   }
 

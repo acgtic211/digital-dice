@@ -1,6 +1,6 @@
 {
     "@context": "https://www.w3.org/2019/wot/td/v1",
-    "id": "container",
+    "id": "acg:lab:virtual-containers:2",
     "title": "ACG Container",
     "@type": "Container",
     "securityDefinitions": {

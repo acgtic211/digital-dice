@@ -1,7 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
-const bodyParser = require("body-parser");
 const cors = require("cors");
 const promBundle = require("express-prom-bundle");
 const fs = require("fs");
@@ -20,10 +19,10 @@ const app = express();
 app.use(cors());
 
 // parse application/json
-app.use(bodyParser.json());
+app.use(express.text(), express.json());
 
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false }));
 
 app.use(metricsMiddleware);
 

@@ -1,4 +1,4 @@
-kubectl create configmap td-config --from-file=originalTd.json
+kubectl create configmap td-config --from-file=td.json
 
 cd ./certs
 

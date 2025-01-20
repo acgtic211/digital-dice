@@ -3,20 +3,14 @@ const EventSource = require("eventsource");
 const request = require("request");
 const router = express.Router();
 const swaggerUi = require("swagger-ui-express");
-const { openAPISpec } = require("./swaggerConfig");
+const { openAPISpec }= require("./swaggerConfig");
 const td = require('./tdLoader');
 const tdLink = require('./tdLinkLoader');
 
-router.get(`/`, (req, res) => {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-  res.send(tdLink);
-});
-
 router.get(`/${td.id}/property/:propertyName/sse`, (req, res) => {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-  if (!td.properties[req.params.propertyName]) {
-    return res.status(404).send("That property doesn't exist");
-  }
+  if (!td.properties[req.params.propertyName])
+    res.status(404).send("That property doesn't exist");
 
   var eventSourceInitDict = { https: { rejectUnauthorized: false } };
   var es = new EventSource(
@@ -29,6 +23,8 @@ router.get(`/${td.id}/property/:propertyName/sse`, (req, res) => {
       "/sse",
     eventSourceInitDict
   );
+  //var es = new EventSource("https://localhost:8063"+"/"+td.id+"/property/"+req.params.propertyName+"/sse", eventSourceInitDict);
+  //request("http://localhost:8063"+"/"+td.id+"/property/"+req.params.propertyName+"/sse").pipe(res);
 
   const headers = {
     "Content-Type": "text/event-stream",
@@ -47,9 +43,8 @@ router.get(`/${td.id}/property/:propertyName/sse`, (req, res) => {
 
 router.get(`/${td.id}/property/:propertyName`, (req, res) => {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-  if (!td.properties[req.params.propertyName]) {
-    return res.status(404).send("That property doesn't exist");
-  }
+  if (!td.properties[req.params.propertyName])
+    res.status(404).send("That property doesn't exist");
 
   const headers = {
     "Content-Type": "application/json",
@@ -67,36 +62,35 @@ router.get(`/${td.id}/property/:propertyName`, (req, res) => {
       "/property/" +
       req.params.propertyName
   ).pipe(res);
+  //request("https://localhost:8063"+"/"+td.id+"/property/"+req.params.propertyName).pipe(res);
 });
 
 router.post(`/${td.id}/property/:propertyName`, (req, res) => {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-  if (!td.properties[req.params.propertyName]) {
-    return res.status(404).send("That property doesn't exist");
-  }
-
-  const requiredProperties = td.properties[req.params.propertyName].required;
-  if (requiredProperties) {
-    for (const element of requiredProperties) {
-      if (req.body[element] === undefined) {
-        return res
-          .status(400)
-          .send(
-            "Some of the necessary properties are not in the request - " +
-              requiredProperties
-          );
-      }
+  if (!td.properties[req.params.propertyName])
+    res.status(404).send("That property doesn't exist");
+    if (td.properties[req.params.propertyName].required) {
+      td.properties[req.params.propertyName].required.forEach((element) => {
+        if (req.body[element] == undefined)
+          res
+            .status(404)
+            .send(
+              "Some of the necessary properties are not in the request - " +
+                td.properties[req.params.propertyName].required
+            );
+      });
     }
-  }
 
   const headers = {
-    "Content-Type": "application/json",
+    "Content-Type": req.headers["content-type"],
     Connection: "keep-alive",
     "Cache-Control": "no-cache",
   };
 
   res.writeHead(200, headers);
-
+  console.log(headers);
+  console.log(req.body);
+  //var reqProp = await wotnectivity.sendRequest(process.env.SUITCASE_URI, { requestType: "write", group: "2/0/0", dataType: "DPT1.001" }, req.body.value);
   request
     .post(
       process.env.DH +
@@ -108,27 +102,23 @@ router.post(`/${td.id}/property/:propertyName`, (req, res) => {
       { json: req.body }
     )
     .pipe(res);
+  //request.post("https://localhost:8063"+"/"+td.id+"/property/"+req.params.propertyName, {"json":req.body}).pipe(res)
 });
 
 router.post(`/${td.id}/action/:actionName`, (req, res) => {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-  if (!td.actions[req.params.actionName]) {
-    return res.status(404).send("That action doesn't exist");
-  }
+  if (!td.actions[req.params.actionName])
+    res.status(404).send("That action doesn't exist");
 
-  const requiredProperties = td.actions[req.params.actionName].required;
-  if (requiredProperties) {
-    for (const element of requiredProperties) {
-      if (req.body[element] === undefined) {
-        return res
-          .status(400)
-          .send(
-            "Some of the necessary properties are not in the request - " +
-              requiredProperties
-          );
-      }
-    }
-  }
+  td.actions[req.params.actionName].required.forEach((element) => {
+    if (req.body[element] == undefined)
+      res
+        .status(404)
+        .send(
+          "Some of the necessary properties are not in the request - " +
+            td.actions[req.params.actionName].required
+        );
+  });
 
   const headers = {
     "Content-Type": "application/json",
@@ -137,6 +127,8 @@ router.post(`/${td.id}/action/:actionName`, (req, res) => {
   };
 
   res.writeHead(200, headers);
+
+  //var reqProp = await wotnectivity.sendRequest(process.env.SUITCASE_URI, { requestType: "write", group: "2/0/0", dataType: "DPT1.001" }, req.body.value);
 
   request
     .post(
@@ -149,13 +141,13 @@ router.post(`/${td.id}/action/:actionName`, (req, res) => {
       { json: req.body }
     )
     .pipe(res);
+  //request.post("https://localhost:8063"+"/"+td.id+"/action/"+req.params.actionName,{"json":req.body}).pipe(res);
 });
 
 router.get(`/${td.id}/event/:eventName`, async (req, res) => {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-  if (!td.events[req.params.eventName]) {
-    return res.status(404).send("That event doesn't exist");
-  }
+  if (!td.actions[req.params.eventName])
+    res.status(404).send("That event doesn't exist");
 
   const headers = {
     "Content-Type": "application/json",
@@ -170,6 +162,12 @@ router.get(`/${td.id}/event/:eventName`, async (req, res) => {
   );
 });
 
+router.get(`/`, (req, res) => {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+  res.send(tdLink);
+});
+
+
 router.use(
   `/openapi`,
   swaggerUi.serve,
@@ -177,5 +175,6 @@ router.use(
     customCss: ".swagger-ui .topbar { display: none }",
   })
 );
+
 
 module.exports = router;

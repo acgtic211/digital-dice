@@ -1,7 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
-const bodyParser = require('body-parser');
 const cors = require('cors');
 const { effectsControl } = require('./effectsControl');
 const routes = require("./routes");
@@ -15,10 +14,10 @@ const app = express();
 app.use(cors());
 
 // parse application/json
-app.use(bodyParser.json())
+app.use(express.text(), express.json())
 
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: false }))
 
 // Apply logs template to express
 app.use(morgan('common'));
