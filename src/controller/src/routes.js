@@ -91,17 +91,33 @@ router.post(`/${td.id}/property/:propertyName`, (req, res) => {
   console.log(headers);
   console.log(req.body);
   //var reqProp = await wotnectivity.sendRequest(process.env.SUITCASE_URI, { requestType: "write", group: "2/0/0", dataType: "DPT1.001" }, req.body.value);
-  request
-    .post(
-      process.env.DH +
-        ":8063" +
-        "/" +
-        td.id +
-        "/property/" +
-        req.params.propertyName,
-      { json: req.body }
-    )
-    .pipe(res);
+  if (req.headers["content-type"] === "application/json") {
+    // Si es JSON, enviar como JSON en la solicitud
+    request
+      .post(
+        process.env.DH +
+          ":8063" +
+          "/" +
+          td.id +
+          "/property/" +
+          req.params.propertyName,
+        { json: req.body, headers: { "Content-Type": req.headers["content-type"] } } // Enviar como JSON
+      )
+      .pipe(res);  // Responder con el contenido de la respuesta
+  } else {
+    // Si es texto plano (raw), enviar como texto
+    request
+      .post(
+        process.env.DH +
+          ":8063" +
+          "/" +
+          td.id +
+          "/property/" +
+          req.params.propertyName,
+        { body: req.body, headers: { "Content-Type": req.headers["content-type"] } } // Enviar como texto plano
+      )
+      .pipe(res);  // Responder con el contenido de la respuesta
+  }
   //request.post("https://localhost:8063"+"/"+td.id+"/property/"+req.params.propertyName, {"json":req.body}).pipe(res)
 });
 

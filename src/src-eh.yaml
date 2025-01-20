@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: src-eh
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: src-eh
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '443'
+      labels:
+        app: src-eh
+    spec:
+      containers:
+      - name: src-eh
+        image: manelme/digital-dice-eh:0.1.0
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 100m
+        envFrom:
+          - configMapRef:
+              name: src-config
+        volumeMounts:
+          - name: tls-src
+            mountPath: "/app/certs"
+            readOnly: true
+          - name: td-config
+            mountPath: "/app/td"
+            readOnly: true
+      volumes:
+        - name: tls-src
+          secret:
+            secretName: tls-src
+        - name: td-config
+          configMap:
+            name: td-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: src-eh-entrypoint
+spec:
+  selector:
+    app: src-eh
+  ports:
+  - protocol: TCP
+    port: 8064
+    targetPort: 8064
+  type: ClusterIP

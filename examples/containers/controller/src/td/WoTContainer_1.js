@@ -1,6 +1,6 @@
 var td = {
     "@context": "https://www.w3.org/2019/wot/td/v1",
-
+    "id": "acg:lab:virtual-containers",
     "title": "ACG Container",
     "@type": "Container",
     "securityDefinitions": {
