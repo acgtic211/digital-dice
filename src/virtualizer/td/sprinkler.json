@@ -1,0 +1,107 @@
+{
+  "@context": ["https://www.w3.org/2019/wot/td/v1"],
+  "id": "urn:dev:acg:virtualsprinkler",
+  "title": "Virtual Sprinkler",
+  "@type": "virtual",
+  "description": "This is a virtual sprinkler for simulating irrigation systems.",
+  "securityDefinitions": {
+    "nosec_sc": {
+      "scheme": "nosec"
+    }
+  },
+  "security": "nosec_sc",
+  "properties": {
+    "status": {
+      "type": "boolean",
+      "description": "Indicates whether the sprinkler is active or not.",
+      "forms": [
+        {
+          "href": "http://localhost:8063/virtualsprinkler:acg:lab/property/status",
+          "contentType": "application/json",
+          "op": ["readproperty", "writeproperty"]
+        }
+      ]
+    },
+    "percentageOpen": {
+      "type": "integer",
+      "description": "The percentage of the sprinkler valve's opening (0-100).",
+      "minimum": 0,
+      "maximum": 100,
+      "forms": [
+        {
+          "href": "http://localhost:8063/virtualsprinkler:acg:lab/property/percentageOpen",
+          "contentType": "application/json",
+          "op": ["readproperty", "writeproperty"]
+        }
+      ]
+    },
+    "action": {
+      "type": "string",
+      "description": "The sprinkler's action mode (static or movement).",
+      "enum": ["static", "movement"],
+      "forms": [
+        {
+          "href": "http://localhost:8063/virtualsprinkler:acg:lab/property/action",
+          "contentType": "application/json",
+          "op": ["readproperty", "writeproperty"]
+        }
+      ]
+    },
+    "waterLeft": {
+      "type": "integer",
+      "description": "The amount of water left in the sprinkler's tank.",
+      "forms": [
+        {
+          "href": "http://localhost:8063/virtualsprinkler:acg:lab/property/waterLeft",
+          "contentType": "application/json",
+          "op": ["readproperty"]
+        }
+      ]
+    }
+  },
+  "actions": {
+    "setStatus": {
+      "description": "Set the sprinkler's status to active or inactive.",
+      "input": {
+        "type": "boolean"
+      },
+      "forms": [
+        {
+          "href": "http://localhost:8063/virtualsprinkler:acg:lab/property/setStatus",
+          "contentType": "application/json",
+          "op": "invokeaction"
+        }
+      ]
+    },
+    "setPercentageOpen": {
+      "description": "Set the percentage of the sprinkler valve's opening.",
+      "input": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 100
+      },
+      "forms": [
+        {
+          "href": "http://localhost:8063/virtualsprinkler:acg:lab/property/setPercentageOpen",
+          "contentType": "application/json",
+          "op": "invokeaction"
+        }
+      ]
+    },
+    "setAction": {
+      "description": "Set the sprinkler's action mode.",
+      "input": {
+        "type": "string",
+        "enum": ["static", "movement"]
+      },
+      "forms": [
+        {
+          "href": "http://localhost:8063/virtualsprinkler:acg:lab/property/setaAction",
+          "contentType": "application/json",
+          "op": "invokeaction"
+        }
+      ]
+    }
+  },
+  "events": {}
+}
