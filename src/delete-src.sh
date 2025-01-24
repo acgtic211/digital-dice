@@ -9,12 +9,19 @@ else
   kubectl delete configmap td-config
 fi
 
-# Contar la cantidad de eventos en la TD utilizando grep
 EVENTS_COUNT=$(grep -o '"events":' "$TD_PATH" | wc -l)
 
 # Si hay eventos, lanzamos el EventHandler (src-eh), si no, no se lanza.
 if [ "$EVENTS_COUNT" -gt 0 ]; then
   kubectl delete -f src-eh.yaml
+fi
+
+TYPE=$(grep -o '"@type":.*' "$TD_PATH" | sed 's/.*"@type"://g' | sed 's/[",]//g' | tr -d '[:space:]')
+if [ -n "$TYPE" ]; then
+  if [ "$TYPE" = "virtual" ] || echo "$TYPE" | grep -q "virtual"; then
+    echo "La Thing Description es de tipo 'virtual'. Lanzando la acción correspondiente."
+    kubectl delete -f src-virtualizer.yaml
+  fi
 fi
 
 kubectl delete secret tls-src
