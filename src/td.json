@@ -1,82 +1,47 @@
 {
-  "@context": ["https://www.w3.org/2019/wot/td/v1"],
-  "id": "urn:dev:ops:virtual-computer-switch-001",
-  "title": "Virtual Computer Switch",
-  "description": "Este es un switch de ordenador virtual.",
-  "@type": ["switch", "virtual"],
-  "security": ["nosec_sc"],
+  "@context": "https://www.w3.org/2019/wot/td/v1",
+  "@type": "virtual",
+  "id": "urn:dev:acg:lab:virtual-bulb",
+  "title": "Virtual Bulb",
+  "description": "A virtual smart light bulb that supports on/off, brightness, and color control.",
   "securityDefinitions": {
-    "nosec_sc": {
+    "no_sec": {
       "scheme": "nosec"
     }
   },
+  "security": "no_sec",
   "properties": {
     "status": {
-      "type": "string",
-      "enum": ["ON", "OFF"],
-      "forms": [
-        {
-          "href": "http://localhost:8065/virtualcomputerswitch:acg:lab/property/status",
-          "contentType": "application/json",
-          "op": ["readproperty", "writeproperty"]
-        }
-      ]
+      "type": "boolean",
+      "description": "Indicates whether the bulb is on or off.",
+      "readOnly": false,
+      "forms": [{
+        "href": "https://localhost:8063/virtualbulb:acg:lab/property/status",
+        "op": ["readproperty", "writeproperty"],
+        "contentType": "application/json"
+      }]
     },
-    "connectedComputers": {
+    "brightness": {
       "type": "integer",
       "minimum": 0,
-      "description": "Número de computadoras actualmente conectadas.",
-      "forms": [
-        {
-          "href": "http://localhost:8065/virtualcomputerswitch:acg:lab/property/connectedComputers",
-          "contentType": "application/json",
-          "op": ["readproperty"]
-        }
-      ]
+      "maximum": 100,
+      "description": "Brightness level of the bulb (0-100).",
+      "readOnly": false,
+      "forms": [{
+        "href": "https://localhost:8063/virtualbulb:acg:lab/property/brightness",
+        "op": ["readproperty", "writeproperty"],
+        "contentType": "application/json"
+      }]
     },
-    "powerConsumption": {
-      "type": "number",
-      "minimum": 0,
-      "description": "Consumo de energía actual en vatios.",
-      "forms": [
-        {
-          "href": "http://localhost:8065/virtualcomputerswitch:acg:lab/property/powerConsumption",
-          "contentType": "application/json",
-          "op": ["readproperty"]
-        }
-      ]
-    }
-  },
-  "actions": {
-    "connectComputer": {
-      "description": "Conecta una computadora al switch.",
-      "forms": [
-        {
-          "href": "http://localhost:8065/virtualcomputerswitch:acg:lab/action/connectComputer",
-          "contentType": "application/json",
-          "op": ["invokeaction"]
-        }
-      ]
-    },
-    "disconnectComputer": {
-      "description": "Desconecta una computadora del switch.",
-      "forms": [
-        {
-          "href": "http://localhost:8065/virtualcomputerswitch:acg:lab/action/disconnectComputer",
-          "contentType": "application/json",
-          "op": ["invokeaction"]
-        }
-      ]
-    },
-    "reboot": {
-      "description": "Reinicia el switch virtual.",
-      "forms": [
-        {
-          "href": "http://localhost:8065/virtualcomputerswitch:acg:lab/action/reboot",
-          "contentType": "application/json",
-          "op": ["invokeaction"]
-        }
-      ]
+    "color": {
+      "type": "string",
+      "description": "Color of the bulb in HEX format.",
+      "readOnly": false,
+      "forms": [{
+        "href": "https://localhost:8063/virtualbulb:acg:lab/property/color",
+        "op": ["readproperty", "writeproperty"],
+        "contentType": "application/json"
+      }]
     }
   }
 }

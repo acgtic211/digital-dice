@@ -1,0 +1,24 @@
+{
+    "@context": ["https://www.w3.org/2019/wot/td/v1"],
+    "id": "urn:dev:acg:lab:virtualdoorsensor",
+    "title": "Virtual Door Sensor",
+    "description": "A virtual door sensor that detects whether the door is open or closed",
+    "securityDefinitions": {
+        "no_sec": { "scheme": "nosec" }
+    },
+    "security": "no_sec",
+    "properties": {
+        "status": {
+            "type": "string",
+            "enum": ["OPEN", "CLOSED"],
+            "readOnly": true,
+            "forms": [{ "href": "http://localhost:8063/virtualdoorsensor:acg:lab/property/status", "op": "readproperty" }]
+        },
+        "structure": {
+            "type": "string",
+            "const": "door",
+            "readOnly": true,
+            "forms": [{ "href": "http://localhost:8063/virtualdoorsensor:acg:lab/property/structure", "op": "readproperty" }]
+        }
+    }
+}

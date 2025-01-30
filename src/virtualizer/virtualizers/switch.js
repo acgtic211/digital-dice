@@ -4,8 +4,8 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const fs = require('fs');
 const https = require('https');
-const mongoose = require('./configdb'); // Importa la configuración de la base de datos
-const { thingInteractionSchema } = require('./models'); // Importa el esquema
+const mongoose = require('../configdb'); // Importa la configuración de la base de datos
+const { thingInteractionSchema } = require('../models'); // Importa el esquema
 
 dotenv.config();
 
@@ -42,11 +42,11 @@ async function logInteraction(interaction, data) {
 }
 
 // Propiedad: Estado del switch
-app.get('/virtualcomputerswitch:acg:lab/property/status', async (req, res) => {
+app.get('/property/status', async (req, res) => {
   res.send({ status: computerSwitchStatus });
 });
 
-app.post('/virtualcomputerswitch:acg:lab/property/status', async (req, res) => {
+app.post('/property/status', async (req, res) => {
   const { status } = req.body;
   if (status === "ON" || status === "OFF") {
     computerSwitchStatus = status;
@@ -58,12 +58,12 @@ app.post('/virtualcomputerswitch:acg:lab/property/status', async (req, res) => {
 });
 
 // Propiedad: Computadoras conectadas
-app.get('/virtualcomputerswitch:acg:lab/property/connectedComputers', async (req, res) => {
+app.get('/property/connectedComputers', async (req, res) => {
   res.send({ connectedComputers });
 });
 
 // Acción: Conectar una computadora
-app.post('/virtualcomputerswitch:acg:lab/action/connectComputer', async (req, res) => {
+app.post('/action/connectComputer', async (req, res) => {
   if (computerSwitchStatus === "OFF") {
     res.status(400).send({ error: "El switch está apagado. No se pueden conectar computadoras." });
     return;
@@ -79,7 +79,7 @@ app.post('/virtualcomputerswitch:acg:lab/action/connectComputer', async (req, re
 });
 
 // Acción: Desconectar una computadora
-app.post('/virtualcomputerswitch:acg:lab/action/disconnectComputer', async (req, res) => {
+app.post('/action/disconnectComputer', async (req, res) => {
   if (connectedComputers > 0) {
     connectedComputers--;
     powerConsumption -= 10.0; // Reduce el consumo de energía
@@ -91,12 +91,12 @@ app.post('/virtualcomputerswitch:acg:lab/action/disconnectComputer', async (req,
 });
 
 // Propiedad: Consumo de energía
-app.get('/virtualcomputerswitch:acg:lab/property/powerConsumption', async (req, res) => {
+app.get('/property/powerConsumption', async (req, res) => {
   res.send({ powerConsumption });
 });
 
 // Acción: Reiniciar el switch
-app.post('/virtualcomputerswitch:acg:lab/action/reboot', async (req, res) => {
+app.post('/action/reboot', async (req, res) => {
   if (computerSwitchStatus === "OFF") {
     res.status(400).send({ error: "El switch está apagado. Enciéndalo antes de reiniciar." });
     return;

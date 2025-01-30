@@ -1,0 +1,48 @@
+{
+    "@context": "https://www.w3.org/2019/wot/td/v1",
+    "@type": "virtual",
+    "id": "urn:dev:acg:lab:virtual-bulb",
+    "title": "Virtual Bulb",
+    "description": "A virtual smart light bulb that supports on/off, brightness, and color control.",
+    "securityDefinitions": {
+      "no_sec": {
+        "scheme": "nosec"
+      }
+    },
+    "security": "no_sec",
+    "properties": {
+      "status": {
+        "type": "boolean",
+        "description": "Indicates whether the bulb is on or off.",
+        "readOnly": false,
+        "forms": [{
+          "href": "https://localhost:8063/virtualbulb:acg:lab/property/status",
+          "op": ["readproperty", "writeproperty"],
+          "contentType": "application/json"
+        }]
+      },
+      "brightness": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 100,
+        "description": "Brightness level of the bulb (0-100).",
+        "readOnly": false,
+        "forms": [{
+          "href": "https://localhost:8063/virtualbulb:acg:lab/property/brightness",
+          "op": ["readproperty", "writeproperty"],
+          "contentType": "application/json"
+        }]
+      },
+      "color": {
+        "type": "string",
+        "description": "Color of the bulb in HEX format.",
+        "readOnly": false,
+        "forms": [{
+          "href": "https://localhost:8063/virtualbulb:acg:lab/property/color",
+          "op": ["readproperty", "writeproperty"],
+          "contentType": "application/json"
+        }]
+      }
+    }
+  }
+  

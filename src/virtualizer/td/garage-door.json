@@ -1,0 +1,69 @@
+{
+    "@context": "https://www.w3.org/2019/wot/td/v1",
+    "id": "urn:acg:lab:virtualgaragedoor",
+    "title": "Virtual Garage Door",
+    "description": "A virtual representation of a garage door",
+    "securityDefinitions": {
+      "no_sec": {
+        "scheme": "nosec"
+      }
+    },
+    "security": "no_sec",
+    "properties": {
+      "status": {
+        "type": "string",
+        "enum": ["OPEN", "CLOSED"],
+        "readOnly": false,
+        "forms": [
+          {
+            "href": "http://localhost:8063/virtualgaragedoor:acg:lab/property/status",
+            "contentType": "application/json",
+            "op": ["readproperty", "writeproperty"]
+          }
+        ]
+      },
+      "percentageOpen": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 100,
+        "readOnly": false,
+        "forms": [
+          {
+            "href": "http://localhost:8063/virtualgaragedoor:acg:lab/property/percentageOpen",
+            "contentType": "application/json",
+            "op": ["readproperty", "writeproperty"]
+          }
+        ]
+      }
+    },
+    "actions": {
+      "setStatus": {
+        "input": {
+          "type": "string",
+          "enum": ["OPEN", "CLOSE"]
+        },
+        "forms": [
+          {
+            "href": "http://localhost:8063/virtualgaragedoor:acg:lab/action/setStatus",
+            "contentType": "application/json",
+            "op": "invokeaction"
+          }
+        ]
+      },
+      "setPercentageOpen": {
+        "input": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "forms": [
+          {
+            "href": "http://localhost:8063/virtualgaragedoor:acg:lab/action/setPercentageOpen",
+            "contentType": "application/json",
+            "op": "invokeaction"
+          }
+        ]
+      }
+    }
+  }
+  

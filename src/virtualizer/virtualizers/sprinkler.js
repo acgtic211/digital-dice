@@ -4,8 +4,8 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const fs = require('fs');
 const https = require('https');
-const mongoose = require('./configdb'); // Importa la configuración de la base de datos
-const { thingInteractionSchema } = require('./models'); // Importa el esquema
+const mongoose = require('../configdb'); // Importa la configuración de la base de datos
+const { thingInteractionSchema } = require('../models'); // Importa el esquema
 
 dotenv.config();
 
@@ -41,11 +41,11 @@ async function logInteraction(interaction, data) {
   }
 }
 // Propiedad: Estado del aspersor
-app.get('/virtualsprinkler:acg:lab/property/status', async (req, res) => {
+app.get('/property/status', async (req, res) => {
   res.send({ status });
 });
 
-app.post('/virtualsprinkler:acg:lab/property/status', async (req, res) => {
+app.post('/property/status', async (req, res) => {
   const { status: newStatus } = req.body;
   if (typeof newStatus === "boolean") {
     status = newStatus;
@@ -57,11 +57,11 @@ app.post('/virtualsprinkler:acg:lab/property/status', async (req, res) => {
 });
 
 // Propiedad: Porcentaje de apertura
-app.get('/virtualsprinkler:acg:lab/property/percentageOpen', async (req, res) => {
+app.get('/property/percentageOpen', async (req, res) => {
   res.send({ percentageOpen });
 });
 
-app.post('/virtualsprinkler:acg:lab/property/percentageOpen', async (req, res) => {
+app.post('/property/percentageOpen', async (req, res) => {
   const { percentageOpen: newPercentage } = req.body;
   if (Number.isInteger(newPercentage) && newPercentage >= 0 && newPercentage <= 100) {
     percentageOpen = newPercentage;
@@ -74,11 +74,11 @@ app.post('/virtualsprinkler:acg:lab/property/percentageOpen', async (req, res) =
 });
 
 // Propiedad: Acción del aspersor
-app.get('/virtualsprinkler:acg:lab/property/action', async (req, res) => {
+app.get('/property/action', async (req, res) => {
   res.send({ action });
 });
 
-app.post('/virtualsprinkler:acg:lab/property/action', async (req, res) => {
+app.post('/property/action', async (req, res) => {
   const { action: newAction } = req.body;
   if (newAction === "static" || newAction === "movement") {
     action = newAction;
@@ -90,12 +90,12 @@ app.post('/virtualsprinkler:acg:lab/property/action', async (req, res) => {
 });
 
 // Propiedad: Agua restante
-app.get('/virtualsprinkler:acg:lab/property/waterLeft', async (req, res) => {
+app.get('/property/waterLeft', async (req, res) => {
   res.send({ waterLeft });
 });
 
 // Acción: Configurar el estado del aspersor
-app.post('/virtualsprinkler:acg:lab/action/setStatus', async (req, res) => {
+app.post('/action/setStatus', async (req, res) => {
   const { status: newStatus } = req.body;
   if (typeof newStatus === "boolean") {
     status = newStatus;
@@ -107,7 +107,7 @@ app.post('/virtualsprinkler:acg:lab/action/setStatus', async (req, res) => {
 });
 
 // Acción: Configurar porcentaje de apertura
-app.post('/virtualsprinkler:acg:lab/action/setPercentageOpen', async (req, res) => {
+app.post('/action/setPercentageOpen', async (req, res) => {
   const { percentageOpen: newPercentage } = req.body;
   if (Number.isInteger(newPercentage) && newPercentage >= 0 && newPercentage <= 100) {
     percentageOpen = newPercentage;
@@ -120,7 +120,7 @@ app.post('/virtualsprinkler:acg:lab/action/setPercentageOpen', async (req, res) 
 });
 
 // Acción: Configurar acción del aspersor
-app.post('/virtualsprinkler:acg:lab/action/setAction', async (req, res) => {
+app.post('/action/setAction', async (req, res) => {
   const { action: newAction } = req.body;
   if (newAction === "static" || newAction === "movement") {
     action = newAction;

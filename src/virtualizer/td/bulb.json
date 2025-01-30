@@ -1,0 +1,67 @@
+{
+    "@context": "https://www.w3.org/2019/wot/td/v1",
+    "id": "urn:acg:lab:virtualbulb",
+    "title": "Virtual Light Bulb",
+    "description": "A virtual representation of a light bulb",
+    "securityDefinitions": {
+      "no_sec": {
+        "scheme": "nosec"
+      }
+    },
+    "security": "no_sec",
+    "properties": {
+      "status": {
+        "type": "boolean",
+        "readOnly": false,
+        "forms": [
+          {
+            "href": "http://localhost:8063/virtualbulb:acg:lab/property/status",
+            "contentType": "application/json",
+            "op": ["readproperty", "writeproperty"]
+          }
+        ]
+      },
+      "brightness": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 255,
+        "readOnly": false,
+        "forms": [
+          {
+            "href": "http://localhost:8063/virtualbulb:acg:lab/property/brightness",
+            "contentType": "application/json",
+            "op": ["readproperty", "writeproperty"]
+          }
+        ]
+      }
+    },
+    "actions": {
+      "setStatus": {
+        "input": {
+          "type": "boolean"
+        },
+        "forms": [
+          {
+            "href": "http://localhost:8063/virtualbulb:acg:lab/action/setStatus",
+            "contentType": "application/json",
+            "op": "invokeaction"
+          }
+        ]
+      },
+      "setBrightness": {
+        "input": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 255
+        },
+        "forms": [
+          {
+            "href": "http://localhost:8063/virtualbulb:acg:lab/action/setBrightness",
+            "contentType": "application/json",
+            "op": "invokeaction"
+          }
+        ]
+      }
+    }
+  }
+  

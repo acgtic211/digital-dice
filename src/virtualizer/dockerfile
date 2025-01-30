@@ -16,4 +16,4 @@ RUN npm install
 COPY . .
 
 EXPOSE 8065
-CMD [ "node", "virtual-switch.js" ]
+CMD [ "node", "virtual-bulb.js" ]

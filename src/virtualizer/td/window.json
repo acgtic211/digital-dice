@@ -1,0 +1,25 @@
+{
+    "@context": ["https://www.w3.org/2019/wot/td/v1"],
+    "id": "urn:dev:acg:lab:virtualblindsensor",
+    "title": "Virtual Window Sensor",
+    "description": "A virtual window sensor that detects whether the window is open or closed and its opening percentage",
+    "securityDefinitions": {
+        "no_sec": { "scheme": "nosec" }
+    },
+    "security": "no_sec",
+    "properties": {
+        "status": {
+            "type": "string",
+            "enum": ["OPEN", "CLOSED"],
+            "readOnly": true,
+            "forms": [{ "href": "http://localhost:8063/virtualblindsensor:acg:lab/property/status", "op": "readproperty" }]
+        },
+        "percentageOpen": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "readOnly": true,
+            "forms": [{ "href": "http://localhost:8063/virtualblindsensor:acg:lab/property/percentageOpen", "op": "readproperty" }]
+        }
+    }
+}

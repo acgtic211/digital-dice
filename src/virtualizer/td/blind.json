@@ -1,0 +1,49 @@
+{
+    "@context": ["https://www.w3.org/2019/wot/td/v1"],
+    "id": "urn:dev:acg:lab:virtualblindsensor",
+    "title": "Virtual Blind Sensor",
+    "description": "A virtual blind sensor that provides environmental properties",
+    "securityDefinitions": {
+        "no_sec": { "scheme": "nosec" }
+    },
+    "security": "no_sec",
+    "properties": {
+        "status": {
+            "type": "boolean",
+            "readOnly": true,
+            "forms": [{ "href": "http://localhost:8063/virtualblindsensor:acg:lab/property/status", "op": "readproperty" }]
+        },
+        "motion": {
+            "type": "boolean",
+            "readOnly": true,
+            "forms": [{ "href": "http://localhost:8063/virtualblindsensor:acg:lab/property/motion", "op": "readproperty" }]
+        },
+        "battery": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+            "readOnly": true,
+            "forms": [{ "href": "http://localhost:8063/virtualblindsensor:acg:lab/property/battery", "op": "readproperty" }]
+        },
+        "temperature": {
+            "type": "number",
+            "readOnly": true,
+            "forms": [{ "href": "http://localhost:8063/virtualblindsensor:acg:lab/property/temperature", "op": "readproperty" }]
+        },
+        "illuminance": {
+            "type": "integer",
+            "readOnly": true,
+            "forms": [{ "href": "http://localhost:8063/virtualblindsensor:acg:lab/property/illuminance", "op": "readproperty" }]
+        },
+        "dark": {
+            "type": "boolean",
+            "readOnly": true,
+            "forms": [{ "href": "http://localhost:8063/virtualblindsensor:acg:lab/property/dark", "op": "readproperty" }]
+        },
+        "daylight": {
+            "type": "boolean",
+            "readOnly": true,
+            "forms": [{ "href": "http://localhost:8063/virtualblindsensor:acg:lab/property/daylight", "op": "readproperty" }]
+        }
+    }
+}

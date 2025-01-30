@@ -1,0 +1,33 @@
+{
+    "@context": "https://www.w3.org/2019/wot/td/v1",
+    "id": "urn:dev:acg:lab:virtualsmokedetector",
+    "title": "Virtual Smoke Detector",
+    "description": "A virtual smoke detector for simulation and testing purposes.",
+    "properties": {
+      "status": {
+        "type": "boolean",
+        "description": "Indicates whether the smoke detector is active.",
+        "readOnly": false
+      },
+      "detectSmoke": {
+        "type": "boolean",
+        "description": "Indicates if smoke is detected.",
+        "readOnly": true
+      }
+    },
+    "actions": {
+      "setStatus": {
+        "description": "Activates or deactivates the smoke detector.",
+        "input": {
+          "type": "boolean"
+        }
+      },
+      "setDetectSmoke": {
+        "description": "Simulates smoke detection (for testing).",
+        "input": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+  
