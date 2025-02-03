@@ -1,63 +1,98 @@
-const express = require('express');
-const morgan = require('morgan');
-const dotenv = require('dotenv');
-const cors = require('cors');
+const mongoose = require('../configdb'); 
+const { thingInteractionSchema } = require('../models'); 
 
-dotenv.config();
 
-// Crea el servidor web
-const app = express();
+const ThingInteraction = mongoose.model('ThingInteraction', thingInteractionSchema);
 
-// Habilita CORS
-app.use(cors());
-
-// Habilita JSON parsing
-app.use(express.json());
-
-// Aplica logs a Express
-app.use(morgan('common'));
-
-// Variables del sensor de persianas
-let status = true;
+// Variables del sensor
+let status = "CLOSED"; // Abierta o Cerrada
+let percentageOpen = 50; // Empieza a la mitad
+let battery = 100; // Batería de la persiana
 let motion = false;
-let battery = 100;
-let temperature = 20;
-let illuminance = 1000;
+let temperature = 20; // °C
+let illuminance = 500; // Nivel de luz
 let dark = false;
 let daylight = true;
 
-app.get('/', async (req, res) => {
-    res.send("This is a virtual blind sensor");
-});
+// Guardar en la base de datos
+async function logInteraction(interaction, data) {
+    try {
+        const thingInteraction = new ThingInteraction({
+            device: "acg:lab:virtual-blind",
+            origen: "virtualDevice",
+            interaction,
+            data
+        });
+        await thingInteraction.save();
+    } catch (err) {
+        console.error("❌ Error al guardar la interacción:", err);
+    }
+}
 
-// Endpoints de propiedades
-app.get('/property/status', async (req, res) => {  
-    res.json({ status });
-});
+// Comportamiento de la persiana
+function simulateBlindBehavior() {
+    const now = new Date();
+    const hours = now.getHours();
 
-app.get('/property/motion', async (req, res) => {  
-    res.json({ motion });
-});
+    // 🔹 Simulación de apertura/cierre aleatorio cada cierto tiempo
+    if (Math.random() > 0.5) {
+        const delta = Math.floor(Math.random() * 31) - 15; // Entre -15% y +15%
+        percentageOpen = Math.max(0, Math.min(100, percentageOpen + delta));
+        status = percentageOpen === 0 ? "CLOSED" : "OPEN";
+        motion = percentageOpen !== 0;
+    }
 
-app.get('/property/battery', async (req, res) => {  
-    res.json({ battery });
-});
+    // 🔹 Ajuste de iluminación según la hora y la apertura
+    if (hours >= 6 && hours <= 18) {
+        illuminance = Math.min(1000, percentageOpen * 10);
+    } else {
+        illuminance = Math.max(50, percentageOpen * 5);
+    }
 
-app.get('/property/temperature', async (req, res) => {  
-    res.json({ temperature });
-});
+    // 🔹 Día o noche según la iluminación
+    dark = illuminance < 200;
+    daylight = !dark;
 
-app.get('/property/illuminance', async (req, res) => {  
-    res.json({ illuminance });
-});
+    // 🔹 Simulación de temperatura
+    if (hours >= 12 && hours <= 15) {
+        temperature += percentageOpen > 70 ? 2 : 1;
+    } else {
+        temperature -= percentageOpen < 30 ? 1 : 0.5;
+    }
+    temperature = Math.max(10, Math.min(35, temperature)); 
 
-app.get('/property/dark', async (req, res) => {  
-    res.json({ dark });
-});
+    // 🔹 Descarga y recarga de la batería
+    if (percentageOpen > 0) {
+        battery = Math.max(0, battery - 1);
+    } else {
+        battery = Math.min(100, battery + 2);
+    }
 
-app.get('/property/daylight', async (req, res) => {  
-    res.json({ daylight });
-});
+    // 🔹 Si la batería es menor al 20%, alguien la conecta a cargar
+    if (battery < 20 && Math.random() > 0.7) {
+        battery += 10;
+    }
 
-// Inicia el servidor
-app.listen(8063, () => console.log('Virtual blind sensor running on port 8063!'));
+    // Guardar en la base de datos
+    logInteraction("update", { 
+        status, 
+        motion, 
+        percentageOpen, 
+        illuminance, 
+        temperature, 
+        battery, 
+        daylight, 
+        dark 
+    });
+
+    console.log(`🔹 Persiana: ${status} | ${percentageOpen}% | Luz: ${illuminance} | Temp: ${temperature}°C | Batería: ${battery}%`);
+}
+
+// Método para iniciar el comportamiento de la persiana
+function startBehavior() {
+    setInterval(simulateBlindBehavior, Math.floor(Math.random() * (5 - 2 + 1) + 2) * 60 * 1000);
+}
+
+module.exports = {
+    startBehavior
+  };

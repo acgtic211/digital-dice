@@ -1,38 +1,39 @@
-const express = require('express');
-const morgan = require('morgan');
-const dotenv = require('dotenv');
-const cors = require('cors');
+const mongoose = require('../configdb');
+const { thingInteractionSchema } = require('../models');
 
-dotenv.config();
-
-// Crea el servidor web
-const app = express();
-
-// Habilita CORS
-app.use(cors());
-
-// Habilita JSON parsing
-app.use(express.json());
-
-// Aplica logs a Express
-app.use(morgan('common'));
+const ThingInteraction = mongoose.model('ThingInteraction', thingInteractionSchema);
 
 // Variables del sensor de puerta
 let status = "CLOSED";
-let structure = "door";
 
-app.get('/', async (req, res) => {
-    res.send("This is a virtual door sensor!");
-});
+async function logInteraction(interaction, data) {
+    try {
+        const thingInteraction = new ThingInteraction({
+            device: "acg:lab:virtual-door",
+            origen: "virtualDevice",
+            interaction,
+            data
+        });
+        await thingInteraction.save();
+    } catch (err) {
+        console.error("❌ Error al guardar la interacción:", err);
+    }
+}
 
-// Endpoints de propiedades
-app.get('/property/status', async (req, res) => {  
-    res.json({ status });
-});
+function startBehavior() {
+    setInterval(() => {
+        const randomChange = Math.random();
+        
+        if (randomChange < 0.3) {
+            status = status === "CLOSED" ? "OPEN" : "CLOSED";
+            logInteraction("autoChange.status", status);
+            console.log(`🚪 La puerta ahora está: ${status}`);
+        }
+        
+    }, Math.floor(Math.random() * (60000 - 20000) + 20000)); // Intervalo aleatorio entre 20s y 60s
+}
 
-app.get('/property/structure', async (req, res) => {  
-    res.json({ structure });
-});
-
-// Inicia el servidor
-app.listen(8063, () => console.log('Virtual door sensor running on port 8063!'));
+// Exportar módulo con el comportamiento
+module.exports = {
+    startBehavior
+  };

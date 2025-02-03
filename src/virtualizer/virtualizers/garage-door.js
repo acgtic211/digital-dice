@@ -1,93 +1,85 @@
-const express = require('express');
-const morgan = require('morgan');
-const dotenv = require('dotenv');
-const cors = require('cors');
+const mongoose = require('../configdb'); 
+const { thingInteractionSchema } = require('../models');
 
-dotenv.config();
+const ThingInteraction = mongoose.model('ThingInteraction', thingInteractionSchema);
 
-// Creates Web Server
-const app = express();
+let status = "CLOSED";
+let percentageOpen = 0;
+let autoCloseTimeout;
 
-// Cors
-app.use(cors());
-
-// parse application/json
-app.use(express.json());
-
-// Apply logs template to express
-app.use(morgan('common'));
-
-// Garage Door Variables
-var status = "CLOSED";
-var percentageOpen = 0;
-
-app.get('/', async (req, res)=>{
-    res.send("This is a virtual garage door");
-});
-
-// Property status
-app.get('/property/status', async (req, res)=>{  
-    res.send(JSON.parse('{"status":"'+ status +'"}'));
-});
-
-app.post('/property/status', async (req, res)=>{  
-    status = req.body.status;
-    if (req.body.status == "OPEN" || req.body.status == "CLOSED"){
-        status = req.body.status;
-        res.send(JSON.parse('{"status":"'+ status +'"}'));
-    }else{
-        res.send(JSON.parse('{"error": "invalid status"}'));
-        return;
+async function logInteraction(interaction, data) {
+    try {
+        const thingInteraction = new ThingInteraction({
+            device: "acg:lab:virtual-garage",
+            origen: "virtualDevice",
+            interaction,
+            data
+        });
+        await thingInteraction.save();
+    } catch (err) {
+        console.error("❌ Error al guardar la interacción:", err);
     }
-});
+}
 
-// Property percentageOpen
-app.get('/property/percentageOpen', async (req, res)=>{  
-    res.send(JSON.parse('{"percentageOpen":'+ percentageOpen +'}'));
-});
+function startBehavior() {
+    setInterval(() => {
+        const randomAction = Math.random();
 
-app.post('/property/percentageOpen', async (req, res)=>{  
-    if (req.body.percentageOpen >= 0 && req.body.percentageOpen <= 100){
-        percentageOpen = req.body.percentageOpen;
-        res.send(JSON.parse('{"percentageOpen":'+ percentageOpen +'}'));
-        if (req.body.percentageOpen == 0){
-            status = "CLOSED";
-        }else{
-            status = "OPEN";
+        if (randomAction < 0.4) {
+            if (status === "CLOSED") {
+                openGarage();
+            } else {
+                closeGarage();
+            }
         }
-    }else{
-        res.send(JSON.parse('{"error": "invalid percentageOpen"}'));
-        return;
-    }
-});
+        
+    }, Math.floor(Math.random() * (120000 - 30000) + 30000)); 
+}
 
-// Action setStatus
-app.put('/action/setStatus', async (req, res)=>{  
-    status = req.body.status;
-    if (req.body.status == "OPEN" || req.body.status == "CLOSE"){
-        status = req.body.status;
-        res.send(JSON.parse('{"status":"'+ status +'"}'));
-    }else{
-        res.send(JSON.parse('{"error": "invalid status"}'));
-        return;
-    }
-});
-
-// Action setPercentageOpen
-app.put('/action/setPercentageOpen', async (req, res)=>{  
-    if (req.body.percentageOpen >= 0 && req.body.percentageOpen <= 100){
-        percentageOpen = req.body.percentageOpen;
-        res.send(JSON.parse('{"percentageOpen":'+ percentageOpen +'}'));
-        if (req.body.percentageOpen == 0){
-            status = "CLOSED";
-        }else{
-            status = "OPEN";
+function openGarage() {
+    console.log("🔓 Abriendo garaje...");
+    status = "OPEN";
+    let interval = setInterval(() => {
+        if (percentageOpen < 100) {
+            percentageOpen += 10;
+            logInteraction("autoChange.percentageOpen", { percentageOpen });
+            console.log(`📈 Apertura: ${percentageOpen}%`);
+        } else {
+            clearInterval(interval);
+            logInteraction("autoChange.status", { status });
+            console.log("✅ Garaje completamente abierto.");
+            scheduleAutoClose();
         }
-    }else{
-        res.send(JSON.parse('{"error": "invalid percentageOpen"}'));
-        return;
-    }
-});
+    }, 3000); 
+}
 
-// Start the server
-app.listen(8063, () => console.log('Example app listening on port 8063!'))
+function closeGarage() {
+    console.log("🔒 Cerrando garaje...");
+    status = "CLOSED";
+    let interval = setInterval(() => {
+        if (percentageOpen > 0) {
+            percentageOpen -= 10;
+            logInteraction("autoChange.percentageOpen", { percentageOpen });
+            console.log(`📉 Cierre: ${percentageOpen}%`);
+        } else {
+            clearInterval(interval);
+            logInteraction("autoChange.status", { status });
+            console.log("✅ Garaje completamente cerrado.");
+        }
+    }, 3000);
+}
+
+function scheduleAutoClose() {
+    if (autoCloseTimeout) clearTimeout(autoCloseTimeout);
+
+    autoCloseTimeout = setTimeout(() => {
+        if (status === "OPEN") {
+            console.log("⏳ El garaje estuvo abierto por mucho tiempo. Cerrando automáticamente...");
+            closeGarage();
+        }
+    }, Math.floor(Math.random() * (180000 - 60000) + 60000)); 
+}
+
+module.exports = {
+    startBehavior
+  };

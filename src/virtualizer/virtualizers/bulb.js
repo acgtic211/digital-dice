@@ -1,77 +1,63 @@
-const express = require('express');
-const morgan = require('morgan');
-const dotenv = require('dotenv');
-const cors = require('cors');
+const mongoose = require('../configdb'); 
+const { thingInteractionSchema } = require('../models'); 
 
-dotenv.config();
+const ThingInteraction = mongoose.model('ThingInteraction', thingInteractionSchema);
 
-// Crea el servidor web
-const app = express();
+async function logInteraction(interaction, data) {
+    try {
+        const thingInteraction = new ThingInteraction({
+            device: "acg:lab:virtual-bulb",
+            origen: "virtualDevice",
+            interaction,
+            data
+        });
+        await thingInteraction.save();
+    } catch (err) {
+        console.error("Error al guardar la interacción:", err);
+    }
+}
 
-// Habilita CORS
-app.use(cors());
-
-// Habilita JSON parsing
-app.use(express.json());
-
-// Aplica logs a Express
-app.use(morgan('common'));
-
-// Variables de la bombilla
 let status = false;
 let brightness = 0;
 
-app.get('/', async (req, res) => {
-    res.send("This is a virtual light bulb");
-});
+// Simulación de comportamiento dinámico
+function startBehavior() {
+    setInterval(() => {
+        if (!status && Math.random() > 0.7) {
+            status = true;
+            brightness = Math.floor(Math.random() * 100) + 1; // Brillo aleatorio entre 1 y 100
+            logInteraction("autoOn.status", status);
+            logInteraction("autoOn.brightness", brightness);
+            console.log("💡 Encendiendo la bombilla...");
+        }
 
-// Propiedad status
-app.get('/property/status', async (req, res) => {  
-    res.json({ status });
-});
+        if (status) {
+            // Parpadeo aleatorio si la bombilla está encendida
+            if (Math.random() > 0.8) {
+                brightness = brightness > 50 ? 10 : 255;
+                logInteraction("autoAdjust.brightness", brightness);
+                console.log(`💡 Intensidad ajustada a ${brightness}%`);
+            }
 
-app.post('/property/status', async (req, res) => {  
-    if (typeof req.body.status === "boolean") {    
-        status = req.body.status;
-        res.json({ status });
-    } else {
-        res.status(400).json({ error: "Invalid status" });
-    }
-});
+            // Ajuste automático de brillo si nadie lo cambia
+            if (brightness < 50) {
+                brightness += Math.floor(Math.random() * 20);
+                logInteraction("autoAdjust.brightness", brightness);
+                console.log(`💡 Intensidad ajustada a ${brightness}%`);
+            }
 
-// Propiedad brightness
-app.get('/property/brightness', async (req, res) => {  
-    res.json({ brightness });
-});
+            // Posible apagado automático después de un tiempo
+            if (Math.random() > 0.9) {
+                status = false;
+                brightness = 0;
+                logInteraction("autoOff.status", status);
+                logInteraction("autoOff.brightness", brightness);
+                console.log("💡 Apagando la bombilla...");
+            }
+        }
+    }, 100000); // Cada 100 segundos
+}
 
-app.post('/property/brightness', async (req, res) => {  
-    if (Number.isInteger(req.body.brightness) && req.body.brightness >= 0 && req.body.brightness <= 255) {
-        brightness = req.body.brightness;
-        res.json({ brightness });
-    } else {
-        res.status(400).json({ error: "Invalid brightness" });
-    }
-});
-
-// Acción setStatus
-app.put('/action/setStatus', async (req, res) => {  
-    if (typeof req.body.status === "boolean") {    
-        status = req.body.status;
-        res.json({ status });
-    } else {
-        res.status(400).json({ error: "Invalid status" });
-    }
-});
-
-// Acción setBrightness
-app.put('/action/setBrightness', async (req, res) => {  
-    if (Number.isInteger(req.body.brightness) && req.body.brightness >= 0 && req.body.brightness <= 255) {
-        brightness = req.body.brightness;
-        res.json({ brightness });
-    } else {
-        res.status(400).json({ error: "Invalid brightness" });
-    }
-});
-
-// Inicia el servidor
-app.listen(8063, () => console.log('Virtual light bulb running on port 8063!'));
+module.exports = {
+  startBehavior
+};

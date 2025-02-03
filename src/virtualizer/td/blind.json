@@ -1,49 +1,120 @@
 {
-    "@context": ["https://www.w3.org/2019/wot/td/v1"],
-    "id": "urn:dev:acg:lab:virtualblindsensor",
+    "@context": "https://www.w3.org/2019/wot/td/v1",
+    "@type": "VirtualBlindSensor",
+    "id": "urn:dev:ops:virtual-blind-001",
     "title": "Virtual Blind Sensor",
-    "description": "A virtual blind sensor that provides environmental properties",
+    "description": "A virtual blind sensor that simulates real-world behavior.",
     "securityDefinitions": {
-        "no_sec": { "scheme": "nosec" }
+      "no_sec": {
+        "scheme": "nosec"
+      }
     },
     "security": "no_sec",
     "properties": {
-        "status": {
-            "type": "boolean",
-            "readOnly": true,
-            "forms": [{ "href": "http://localhost:8063/virtualblindsensor:acg:lab/property/status", "op": "readproperty" }]
-        },
-        "motion": {
-            "type": "boolean",
-            "readOnly": true,
-            "forms": [{ "href": "http://localhost:8063/virtualblindsensor:acg:lab/property/motion", "op": "readproperty" }]
-        },
-        "battery": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 100,
-            "readOnly": true,
-            "forms": [{ "href": "http://localhost:8063/virtualblindsensor:acg:lab/property/battery", "op": "readproperty" }]
-        },
-        "temperature": {
-            "type": "number",
-            "readOnly": true,
-            "forms": [{ "href": "http://localhost:8063/virtualblindsensor:acg:lab/property/temperature", "op": "readproperty" }]
-        },
-        "illuminance": {
-            "type": "integer",
-            "readOnly": true,
-            "forms": [{ "href": "http://localhost:8063/virtualblindsensor:acg:lab/property/illuminance", "op": "readproperty" }]
-        },
-        "dark": {
-            "type": "boolean",
-            "readOnly": true,
-            "forms": [{ "href": "http://localhost:8063/virtualblindsensor:acg:lab/property/dark", "op": "readproperty" }]
-        },
-        "daylight": {
-            "type": "boolean",
-            "readOnly": true,
-            "forms": [{ "href": "http://localhost:8063/virtualblindsensor:acg:lab/property/daylight", "op": "readproperty" }]
-        }
+      "status": {
+        "type": "string",
+        "description": "Current status of the blind (OPEN or CLOSED).",
+        "readOnly": true,
+        "forms": [
+          {
+            "href": "http://localhost:8063/property/status",
+            "contentType": "application/json",
+            "op": "readproperty"
+          }
+        ]
+      },
+      "motion": {
+        "type": "boolean",
+        "description": "Indicates if the blind is moving.",
+        "readOnly": true,
+        "forms": [
+          {
+            "href": "http://localhost:8063/property/motion",
+            "contentType": "application/json",
+            "op": "readproperty"
+          }
+        ]
+      },
+      "battery": {
+        "type": "integer",
+        "description": "Battery percentage of the blind.",
+        "minimum": 0,
+        "maximum": 100,
+        "readOnly": true,
+        "forms": [
+          {
+            "href": "http://localhost:8063/property/battery",
+            "contentType": "application/json",
+            "op": "readproperty"
+          }
+        ]
+      },
+      "temperature": {
+        "type": "number",
+        "description": "Current temperature near the blind.",
+        "minimum": -10,
+        "maximum": 50,
+        "readOnly": true,
+        "forms": [
+          {
+            "href": "http://localhost:8063/property/temperature",
+            "contentType": "application/json",
+            "op": "readproperty"
+          }
+        ]
+      },
+      "illuminance": {
+        "type": "integer",
+        "description": "Current light level in lumens.",
+        "minimum": 0,
+        "maximum": 1000,
+        "readOnly": true,
+        "forms": [
+          {
+            "href": "http://localhost:8063/property/illuminance",
+            "contentType": "application/json",
+            "op": "readproperty"
+          }
+        ]
+      },
+      "dark": {
+        "type": "boolean",
+        "description": "True if the environment is considered dark.",
+        "readOnly": true,
+        "forms": [
+          {
+            "href": "http://localhost:8063/property/dark",
+            "contentType": "application/json",
+            "op": "readproperty"
+          }
+        ]
+      },
+      "daylight": {
+        "type": "boolean",
+        "description": "True if the environment is in daylight conditions.",
+        "readOnly": true,
+        "forms": [
+          {
+            "href": "http://localhost:8063/property/daylight",
+            "contentType": "application/json",
+            "op": "readproperty"
+          }
+        ]
+      },
+      "percentageOpen": {
+        "type": "integer",
+        "description": "Percentage of how open the blind is (0-100).",
+        "minimum": 0,
+        "maximum": 100,
+        "readOnly": true,
+        "forms": [
+          {
+            "href": "http://localhost:8063/property/percentageOpen",
+            "contentType": "application/json",
+            "op": "readproperty"
+          }
+        ]
+      }
     }
-}
+  }
+  

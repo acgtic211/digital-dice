@@ -13,12 +13,6 @@
             "enum": ["OPEN", "CLOSED"],
             "readOnly": true,
             "forms": [{ "href": "http://localhost:8063/virtualdoorsensor:acg:lab/property/status", "op": "readproperty" }]
-        },
-        "structure": {
-            "type": "string",
-            "const": "door",
-            "readOnly": true,
-            "forms": [{ "href": "http://localhost:8063/virtualdoorsensor:acg:lab/property/structure", "op": "readproperty" }]
         }
     }
 }

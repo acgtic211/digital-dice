@@ -1,38 +1,54 @@
-const express = require('express');
-const morgan = require('morgan');
-const dotenv = require('dotenv');
-const cors = require('cors');
+const mongoose = require('../configdb');
+const { thingInteractionSchema } = require('../models');
 
-dotenv.config();
+const ThingInteraction = mongoose.model('ThingInteraction', thingInteractionSchema);
 
-// Crea el servidor web
-const app = express();
-
-// Habilita CORS
-app.use(cors());
-
-// Habilita JSON parsing
-app.use(express.json());
-
-// Aplica logs a Express
-app.use(morgan('common'));
-
-// Variables del sensor de ventana
 let status = "CLOSED";
 let percentageOpen = 0;
 
-app.get('/', async (req, res) => {
-    res.send("This is a virtual window sensor!");
-});
+async function logInteraction(interaction, data) {
+  try {
+    const thingInteraction = new ThingInteraction({
+      device: "acg:lab:virtual-window",
+      origen: "virtualDevice",
+      interaction,
+      data
+    });
+    await thingInteraction.save();
+  } catch (err) {
+    console.error("Error al guardar la interacción:", err);
+  }
+}
 
-// Endpoints de propiedades
-app.get('/property/status', async (req, res) => {  
-    res.json({ status });
-});
+function startBehavior() {
+  setInterval(() => {
+    const randomValue = Math.random();
 
-app.get('/property/percentageOpen', async (req, res) => {  
-    res.json({ percentageOpen });
-});
+    if (status === "CLOSED" && randomValue < 0.3) { // 30% de probabilidad de abrirse
+      status = "OPEN";
+      percentageOpen = Math.floor(Math.random() * 100) + 1; // Apertura aleatoria entre 1 y 100
+      console.log("🌬️ La ventana se ha abierto.");
+      logInteraction("autoOpenWindow", { status, percentageOpen });
+    } else if (status === "OPEN" && randomValue < 0.3) { // 30% de probabilidad de cerrarse
+      status = "CLOSED";
+      percentageOpen = 0;
+      console.log("🌬️ La ventana se ha cerrado.");
+      logInteraction("autoCloseWindow", { status, percentageOpen });
+    } else {
+      if (status === "CLOSED") {
+        percentageOpen = Math.max(percentageOpen - 5, 0); // Decrementar porcentaje de apertura
+      } else {
+        percentageOpen = Math.min(percentageOpen + 5, 100); // Incrementar porcentaje de apertura
+      }
+    }
 
-// Inicia el servidor
-app.listen(8063, () => console.log('Virtual window sensor running on port 8063!'));
+    console.log(`Estado: ${status} | Apertura: ${percentageOpen}%`);
+
+    logInteraction("autoWindowUpdate", { status, percentageOpen });
+
+  }, 60000); // Ejecuta cada minuto
+}
+
+module.exports = {
+  startBehavior
+};

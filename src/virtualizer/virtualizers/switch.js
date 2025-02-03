@@ -1,32 +1,13 @@
-const express = require('express');
-const morgan = require('morgan');
-const dotenv = require('dotenv');
-const cors = require('cors');
-const fs = require('fs');
-const https = require('https');
-const mongoose = require('../configdb'); // Importa la configuración de la base de datos
-const { thingInteractionSchema } = require('../models'); // Importa el esquema
+const mongoose = require('../configdb');
+const { thingInteractionSchema } = require('../models');
 
-dotenv.config();
-
-// Crear el modelo de ThingInteraction
 const ThingInteraction = mongoose.model('ThingInteraction', thingInteractionSchema);
 
-// Variables del switch de ordenador
-let computerSwitchStatus = "OFF"; // Estado del switch: "ON" o "OFF"
-let connectedComputers = 0; // Número de computadoras conectadas
-let powerConsumption = 50.0; // Consumo de energía en vatios
-let maxComputers = 20; // Capacidad máxima de computadoras conectadas
+let computerSwitchStatus = "OFF";
+let connectedComputers = 0;
+let powerConsumption = 50.0;
+let maxComputers = 20;
 
-// Configuración del servidor
-const app = express();
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(morgan('common'));
-
-// Función para registrar interacciones en la base de datos
 async function logInteraction(interaction, data) {
   try {
     const thingInteraction = new ThingInteraction({
@@ -41,89 +22,46 @@ async function logInteraction(interaction, data) {
   }
 }
 
-// Propiedad: Estado del switch
-app.get('/property/status', async (req, res) => {
-  res.send({ status: computerSwitchStatus });
-});
-
-app.post('/property/status', async (req, res) => {
-  const { status } = req.body;
-  if (status === "ON" || status === "OFF") {
-    computerSwitchStatus = status;
-    await logInteraction("property.status", { status: computerSwitchStatus });
-    res.send({ status: computerSwitchStatus });
-  } else {
-    res.status(400).send({ error: "Estado inválido. Use 'ON' o 'OFF'." });
-  }
-});
-
-// Propiedad: Computadoras conectadas
-app.get('/property/connectedComputers', async (req, res) => {
-  res.send({ connectedComputers });
-});
-
-// Acción: Conectar una computadora
-app.post('/action/connectComputer', async (req, res) => {
-  if (computerSwitchStatus === "OFF") {
-    res.status(400).send({ error: "El switch está apagado. No se pueden conectar computadoras." });
-    return;
-  }
-  if (connectedComputers < maxComputers) {
-    connectedComputers++;
-    powerConsumption += 10.0; // Incrementa el consumo de energía
-    await logInteraction("action.connectComputer", { connectedComputers });
-    res.send({ message: "Computadora conectada.", connectedComputers });
-  } else {
-    res.status(400).send({ error: "Capacidad máxima alcanzada." });
-  }
-});
-
-// Acción: Desconectar una computadora
-app.post('/action/disconnectComputer', async (req, res) => {
-  if (connectedComputers > 0) {
-    connectedComputers--;
-    powerConsumption -= 10.0; // Reduce el consumo de energía
-    await logInteraction("action.disconnectComputer", { connectedComputers });
-    res.send({ message: "Computadora desconectada.", connectedComputers });
-  } else {
-    res.status(400).send({ error: "No hay computadoras conectadas para desconectar." });
-  }
-});
-
-// Propiedad: Consumo de energía
-app.get('/property/powerConsumption', async (req, res) => {
-  res.send({ powerConsumption });
-});
-
-// Acción: Reiniciar el switch
-app.post('/action/reboot', async (req, res) => {
-  if (computerSwitchStatus === "OFF") {
-    res.status(400).send({ error: "El switch está apagado. Enciéndalo antes de reiniciar." });
-    return;
-  }
-  computerSwitchStatus = "OFF";
-  connectedComputers = 0;
-  powerConsumption = 50.0;
-  await logInteraction("action.reboot", { status: "Rebooting" });
-  setTimeout(async () => {
-    computerSwitchStatus = "ON";
-    await logInteraction("action.reboot", { status: "Rebooted" });
-    res.send({ message: "Switch reiniciado exitosamente.", computerSwitchStatus });
-  }, 3000); // Simula un tiempo de reinicio
-});
-
-// Configuración de HTTPS
-https
-  .createServer(
-    {
-      key: fs.readFileSync("/app/certs/privkey.pem"),
-      cert: fs.readFileSync("/app/certs/fullchain.pem"),
-    },
-    app
-  )
-  .listen(process.env.PORT_VIRTUALIZER, (err) => {
-    if (err) {
-      throw new Error(err);
+function startBehavior() {
+  setInterval(() => {
+    // Encender el switch de forma aleatoria
+    if (computerSwitchStatus === "OFF" && Math.random() > 0.7) {
+      computerSwitchStatus = "ON";
+      logInteraction("autoSwitchOn", { computerSwitchStatus });
+      console.log("🔌 El switch se ha encendido automáticamente.");
     }
-    console.log("Listening on port " + process.env.PORT_VIRTUALIZER);
-  });
+
+    if (computerSwitchStatus === "OFF") {
+      console.log("⚠️ El switch está apagado. No se pueden realizar acciones.");
+      return;
+    }
+
+    if (connectedComputers < maxComputers) {
+      connectedComputers++;
+      powerConsumption += 10.0;
+      console.log(`🖥️ Computadora conectada. Total de computadoras conectadas: ${connectedComputers}`);
+    } else {
+      console.log("⚡ Capacidad máxima de computadoras conectadas alcanzada.");
+    }
+
+    logInteraction("autoConnectComputer", { connectedComputers, powerConsumption });
+
+    if (Math.random() < 0.1 && connectedComputers > 0) {
+      connectedComputers--;
+      powerConsumption -= 10.0;
+      console.log(`🔌 Computadora desconectada. Total de computadoras conectadas: ${connectedComputers}`);
+      logInteraction("autoDisconnectComputer", { connectedComputers, powerConsumption });
+    }
+
+    if (powerConsumption > 100) {
+      console.log("⚡ ¡Consumo de energía alto!");
+    } else if (powerConsumption < 50) {
+      console.log("💡 Consumo de energía bajo.");
+    }
+
+  }, 60000); // Cada 60 segundos
+}
+
+module.exports = {
+  startBehavior
+};
