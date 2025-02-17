@@ -1,26 +1,87 @@
 {
-  "@context": ["https://www.w3.org/2019/wot/td/v1"],
-  "id": "urn:dev:acg:lab:virtualblindsensor",
-  "title": "Virtual Window Sensor",
-  "@type": ["virtual", "window"],
-  "description": "A virtual window sensor that detects whether the window is open or closed and its opening percentage",
+  "@context": "https://www.w3.org/2019/wot/td/v1",
+  "id": "urn:dev:acg:lab:environment_sensor",
+  "title": "Environment Sensor",
+  "@type": ["virtual", "custom"],
+  "description": "Sensor de temperatura, luz y movimiento",
   "securityDefinitions": {
-      "no_sec": { "scheme": "nosec" }
+    "no_sec": {
+      "scheme": "nosec"
+    }
   },
-  "security": "no_sec",
+  "security": ["no_sec"],
   "properties": {
-      "status": {
-          "type": "string",
-          "enum": ["OPEN", "CLOSED"],
-          "readOnly": true,
-          "forms": [{ "href": "http://localhost:8063/virtualblindsensor:acg:lab/property/status", "op": "readproperty" }]
+    "temperature": {
+      "type": "number",
+      "description": "Temperatura medida por el sensor",
+      "observable": true,
+      "readOnly": false,
+      "forms": [
+        {
+          "href": "/properties/temperature",
+          "contentType": "application/json",
+          "op": ["readproperty", "writeproperty", "observeproperty"]
+        }
+      ]
+    },
+    "light": {
+      "type": "number",
+      "description": "Nivel de luz medido por el sensor",
+      "observable": true,
+      "readOnly": false,
+      "forms": [
+        {
+          "href": "/properties/light",
+          "contentType": "application/json",
+          "op": ["readproperty", "writeproperty", "observeproperty"]
+        }
+      ]
+    },
+    "motion": {
+      "type": "boolean",
+      "description": "Detección de movimiento por el sensor",
+      "observable": true,
+      "readOnly": false,
+      "forms": [
+        {
+          "href": "/properties/motion",
+          "contentType": "application/json",
+          "op": ["readproperty", "writeproperty", "observeproperty"]
+        }
+      ]
+    }
+  },
+  "actions": {
+    "updateTemperature": {
+      "description": "Actualizar la temperatura",
+      "input": {
+        "type": "number"
       },
-      "percentageOpen": {
-          "type": "integer",
-          "minimum": 0,
-          "maximum": 100,
-          "readOnly": true,
-          "forms": [{ "href": "http://localhost:8063/virtualblindsensor:acg:lab/property/percentageOpen", "op": "readproperty" }]
-      }
+      "output": {
+        "type": "number"
+      },
+      "forms": [
+        {
+          "href": "/actions/updateTemperature",
+          "contentType": "application/json",
+          "op": ["invokeaction"]
+        }
+      ]
+    }
+  },
+  "events": {
+    "temperatureThresholdExceeded": {
+      "description": "Evento cuando la temperatura supera los 25°C",
+      "data": {
+        "type": "boolean"
+      },
+      "forms": [
+        {
+          "href": "/events/temperatureThresholdExceeded",
+          "contentType": "application/json",
+          "op": ["subscribeevent"]
+        }
+      ]
+    }
   }
 }

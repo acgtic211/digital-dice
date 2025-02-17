@@ -1,0 +1,72 @@
+{
+  "id": "sensor_001",
+  "thing_id": "urn:dev:acg:lab:environment_sensor",
+  "description": "Sensor de temperatura, luz y movimiento",
+  "timings": 10,
+  "default_values": {
+    "property.temperature": 22.5,
+    "property.light": 300,
+    "property.motion": false
+  },
+  "behaviour": [
+    {
+      "map": {
+        "in": "property.temperature",
+        "out": "property.temperature",
+        "value": 22.5
+      }
+    },
+    {
+      "arithmeticExpression": {
+        "eval_exp": "temperature * 1.5 + speed",
+        "out": "energy"
+      }
+    },
+    {
+      "map": {
+        "in": "property.light",
+        "out": "property.light",
+        "value": 300
+      }
+    },
+    {
+      "conditional": {
+        "eval_exp": "if (property.light < 100) property.light = 100;"
+      }
+    },
+    {
+      "map": {
+        "in": "property.motion",
+        "out": "property.motion",
+        "value": false
+      }
+    },
+    {
+      "conditional": {
+        "eval_exp": "if (property.motion) property.light = 500;"
+      }
+    },
+    {
+      "arithmeticExpression": {
+        "expression": "property.temperature + 5",
+        "out": "property.temperature"
+      }
+    },
+    {
+      "distribution": {
+        "type": "normal",
+        "mean": 50,
+        "stddev": 10,
+        "out": "property.light"
+      }
+    },
+    {
+      "distribution": {
+        "type": "normal",
+        "mean": 22.5,
+        "stddev": 2,
+        "out": "property.temperature"
+      }
+    }
+  ]
+}

@@ -1,70 +1,16 @@
 const dotenv = require('dotenv');
-const fs = require('fs');
 const https = require('https');
-const td = require('./tdLoader'); // Carga la TD directamente
-
-// Importación de virtualizadores
-const virtualBulb = require('./virtualizers/bulb');
-const virtualBlind = require('./virtualizers/blind');
-const virtualDoor = require('./virtualizers/door');
-const virtualGarage = require('./virtualizers/garage-door');
-const virtualHueBulb = require('./virtualizers/hue-bulb');
-const virtualSensor = require('./virtualizers/sensor');
-const virtualSwitch = require('./virtualizers/switch');
-const virtualSmokeDetector = require('./virtualizers/smoke-detector');
-const virtualWindow = require('./virtualizers/window');
-const virtualSprinkler = require('./virtualizers/sprinkler');
+const fs = require('fs');
+const td = require('./tdLoader');
+const virtualizers = require('./generic-virtualizer');
 
 dotenv.config();
 
-const virtualizers = {
-  "bulb": virtualBulb,
-  "smoke-detector": virtualSmokeDetector,
-  "garage-door": virtualGarage,
-  "sensor": virtualSensor,
-  "door": virtualDoor,
-  "blind": virtualBlind,
-  "hue-bulb": virtualHueBulb,
-  "switch": virtualSwitch,
-  "window": virtualWindow,
-  "sprinkler": virtualSprinkler
-};
-
-function findMatchingType(type, virtualizers) {
-  const typeLower = type.toLowerCase();
-  return Object.keys(virtualizers).find(key => key.toLowerCase() === typeLower);
-}
-
-if (td["@type"] && td.id) {
-  const types = Array.isArray(td["@type"]) ? td["@type"] : [td["@type"]];
-  const tdId = td.id;
-
-  let virtualizer;
-  let matchedType;
-  for (const type of types) {
-    const matchingType = findMatchingType(type, virtualizers);
-    if (matchingType) {
-      virtualizer = virtualizers[matchingType];
-      matchedType = type;
-      break;
-    }
-  }
-
-  if (virtualizer) {
-    console.log(`✅ Iniciando virtualizador para ${matchedType} con ID: ${tdId}`);
-
-    if (typeof virtualizer.startBehavior === "function") {
-      virtualizer.startBehavior();
-      console.log(`🚀 Comportamiento automático activado para ${matchedType}`);
-    } else {
-      console.warn(`⚠️ El virtualizador ${matchedType} no tiene comportamiento automático.`);
-    }
-  } else {
-    console.error(`❌ No se encontró un virtualizador para los tipos: ${types}`);
-    process.exit(1);
-  }
+if (td.id) {
+  console.log(`✅ Iniciando virtualizador para dispositivo ID: ${td.id}`);
+  virtualizers.startBehavior(td);
 } else {
-  console.error("❌ Error: La TD no tiene '@type' o 'id'.");
+  console.error("❌ Error: La TD no tiene 'id'.");
   process.exit(1);
 }
 
