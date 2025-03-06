@@ -18,8 +18,8 @@
     },
     {
       "arithmeticExpression": {
-        "eval_exp": "temperature * 1.5 + speed",
-        "out": "energy"
+        "eval_exp": "property.temperature * 1.5",
+        "out": "property.energy"
       }
     },
     {
