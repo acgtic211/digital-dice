@@ -2,11 +2,13 @@
   "id": "sensor_001",
   "thing_id": "urn:dev:acg:lab:environment_sensor",
   "description": "Sensor de temperatura, luz y movimiento",
-  "timings": 10,
+  "timings": 10000,
   "default_values": {
-    "property.temperature": 22.5,
-    "property.light": 300,
-    "property.motion": false
+    "property.temperature": 22,
+    "property.light": 1000,
+    "property.motion": false,
+    "property.battery": 100,
+    "property.fire": false
   },
   "behaviour": [
     {
@@ -17,21 +19,23 @@
       }
     },
     {
-      "arithmeticExpression": {
-        "eval_exp": "property.temperature * 1.5",
-        "out": "property.energy"
+      "list": {
+        "values": [22.5, 23.0, 23.5, 24.0],
+        "index": 1,
+        "out": "property.temperature"
       }
     },
     {
-      "map": {
-        "in": "property.light",
-        "out": "property.light",
-        "value": 300
+      "arithmeticExpression": {
+        "eval_exp": "property.temperature * 1.5",
+        "out": "property.temperature"
       }
     },
     {
       "conditional": {
-        "eval_exp": "if (property.light < 100) property.light = 100;"
+        "eval_exp": "property.light < 700",
+        "out": "property.light",
+        "value": 700
       }
     },
     {
@@ -43,29 +47,39 @@
     },
     {
       "conditional": {
-        "eval_exp": "if (property.motion) property.light = 500;"
-      }
-    },
-    {
-      "arithmeticExpression": {
-        "expression": "property.temperature + 5",
-        "out": "property.temperature"
+        "eval_exp": "property.motion",
+        "out": "property.light",
+        "value": 500
       }
     },
     {
       "distribution": {
         "type": "normal",
-        "mean": 50,
-        "stddev": 10,
+        "mean": 500,
+        "standard_deviation": 200,
         "out": "property.light"
       }
     },
     {
       "distribution": {
-        "type": "normal",
-        "mean": 22.5,
-        "stddev": 2,
+        "type": "discrete",
+        "min": 20,
+        "max": 30,
         "out": "property.temperature"
+      }
+    },
+    {
+      "conditional": {
+        "eval_exp": "property.temperature >= 29",
+        "out": "property.fire",
+        "value": true
+      }
+    },
+    {
+      "conditional": {
+        "eval_exp": "property.temperature < 29",
+        "out": "property.fire",
+        "value": false
       }
     }
   ]

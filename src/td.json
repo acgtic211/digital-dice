@@ -49,6 +49,45 @@
           "op": ["readproperty", "writeproperty", "observeproperty"]
         }
       ]
+    },
+    "battery": {
+      "type": "number",
+      "description": "Nivel de batería del sensor",
+      "observable": true,
+      "readOnly": false,
+      "forms": [
+        {
+          "href": "/properties/battery",
+          "contentType": "application/json",
+          "op": ["readproperty", "writeproperty", "observeproperty"]
+        }
+      ]
+    },
+    "fire": {
+      "type": "boolean",
+      "description": "Detección de incendio",
+      "observable": true,
+      "readOnly": false,
+      "forms": [
+        {
+          "href": "/properties/fire",
+          "contentType": "application/json",
+          "op": ["readproperty", "writeproperty", "observeproperty"]
+        }
+      ]
+    },
+    "robberyDetected": {
+      "type": "boolean",
+      "description": "Detección de robo",
+      "observable": true,
+      "readOnly": false,
+      "forms": [
+        {
+          "href": "/properties/robberyDetected",
+          "contentType": "application/json",
+          "op": ["readproperty", "writeproperty", "observeproperty"]
+        }
+      ]
     }
   },
   "actions": {
