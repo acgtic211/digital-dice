@@ -1,86 +1,160 @@
 {
   "id": "sensor_001",
-  "thing_id": "urn:dev:acg:lab:environment_sensor",
+  "thing_id": "smartThermostat001",
+  "thing_type": "thermostat",
   "description": "Sensor de temperatura, luz y movimiento",
-  "timings": 10000,
+  "timings": 1000,
   "default_values": {
-    "property.temperature": 22,
-    "property.light": 1000,
-    "property.motion": false,
+    "property.temperature": 22.5,
+    "property.humidity": 45,
     "property.battery": 100,
-    "property.fire": false
+    "property.motion": false,
+    "property.lightLevel": 70,
+    "property.outdoorTemperature": 25,
+    "property.windows": "closed",
+    "property.hvacMode": "auto",
+    "property.timestamp": 1628097868
   },
   "behaviour": [
     {
-      "map": {
-        "in": "property.temperature",
-        "out": "property.temperature",
-        "value": 22.5
-      }
-    },
-    {
-      "list": {
-        "values": [22.5, 23.0, 23.5, 24.0],
-        "index": 1,
-        "out": "property.temperature"
-      }
-    },
-    {
-      "arithmeticExpression": {
-        "eval_exp": "property.temperature * 1.5",
-        "out": "property.temperature"
-      }
-    },
-    {
-      "conditional": {
-        "eval_exp": "property.light < 700",
-        "out": "property.light",
-        "value": 700
-      }
-    },
-    {
-      "map": {
-        "in": "property.motion",
-        "out": "property.motion",
-        "value": false
-      }
-    },
-    {
-      "conditional": {
-        "eval_exp": "property.motion",
-        "out": "property.light",
-        "value": 500
-      }
-    },
-    {
+      "inputs": [],
+      "outputs": ["property.temperature"],
       "distribution": {
         "type": "normal",
-        "mean": 500,
-        "standard_deviation": 200,
-        "out": "property.light"
-      }
+        "mean": 22.5,
+        "standard_deviation": 3
+      },
+      "description": "Temperature fluctuates following a normal distribution"
     },
     {
+      "inputs": [],
+      "outputs": ["property.outdoorTemperature"],
+      "distribution": {
+        "type": "normal",
+        "mean": 25,
+        "standard_deviation": 5
+      },
+      "description": "Outdoor temperature fluctuates following a normal distribution"
+    },
+    {
+      "inputs": ["property.temperature"],
+      "outputs": ["property.temperatureF"],
+      "arithmeticExpression": {
+        "eval_exp": "property.temperature * 9/5 + 32"
+      },
+      "description": "Convert temperature from Celsius to Fahrenheit"
+    },
+    {
+      "inputs": [],
+      "outputs": ["property.battery"],
+      "list": {
+        "values": [100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0],
+        "index": 0
+      },
+      "description": "Battery level decreases over time in steps"
+    },
+    {
+      "inputs": ["property.battery"],
+      "outputs": ["property.batteryStatus"],
+      "conditional": {
+        "eval_exp": "property.battery < 20",
+        "value": "low"
+      },
+      "description": "Set battery status to 'low' when battery is below 20%"
+    },
+    {
+      "inputs": ["property.battery"],
+      "outputs": ["property.batteryAlert"],
+      "conditional": {
+        "eval_exp": "property.battery < 10",
+        "value": true
+      },
+      "description": "Trigger battery alert when battery is below 10%"
+    },
+    {
+      "inputs": [],
+      "outputs": ["property.humidity"],
+      "distribution": {
+        "type": "normal",
+        "mean": 45,
+        "standard_deviation": 5
+      },
+      "description": "Humidity fluctuates following a normal distribution"
+    },
+    {
+      "inputs": [],
+      "outputs": ["property.lightLevel"],
       "distribution": {
         "type": "discrete",
-        "min": 20,
-        "max": 30,
-        "out": "property.temperature"
-      }
+        "min": 50,
+        "max": 100
+      },
+      "description": "Light level varies between min and max values"
     },
     {
+      "inputs": ["property.temperature", "property.humidity"],
+      "outputs": ["property.comfortIndex"],
+      "mlModel": {
+        "url": "https://api.example.com/comfort-index",
+        "headers": {
+          "Authorization": "Bearer api_key_12345",
+          "Content-Type": "application/json"
+        }
+      },
+      "description": "Calculate comfort index based on temperature and humidity using ML model"
+    },
+    {
+      "inputs": ["property.temperature", "property.outdoorTemperature"],
+      "outputs": ["property.hvacPower"],
+      "arithmeticExpression": {
+        "eval_exp": "abs(property.temperature - property.outdoorTemperature) * 0.25"
+      },
+      "description": "Calculate HVAC power based on temperature difference"
+    },
+    {
+      "inputs": [],
+      "outputs": ["property.timestamp"],
+      "map": {
+        "value": "CURRENT_TIMESTAMP"
+      },
+      "description": "Update timestamp with current time"
+    },
+    {
+      "inputs": ["property.temperature", "property.humidity"],
+      "outputs": ["property.fire"],
       "conditional": {
-        "eval_exp": "property.temperature >= 29",
-        "out": "property.fire",
+        "eval_exp": "property.temperature > 50 && property.humidity < 20",
         "value": true
-      }
+      },
+      "description": "Detect potential fire conditions based on high temperature and low humidity"
     },
     {
+      "inputs": [],
+      "outputs": ["property.motion"],
+      "distribution": {
+        "type": "discrete",
+        "min": 0,
+        "max": 1
+      },
+      "description": "Randomly simulate motion detection (0 = false, 1 = true)"
+    },
+    {
+      "inputs": ["property.motion"],
+      "outputs": ["event.presenceDetected"],
       "conditional": {
-        "eval_exp": "property.temperature < 29",
-        "out": "property.fire",
-        "value": false
-      }
+        "eval_exp": "property.motion == 1",
+        "value": "PRESENCE_DETECTED"
+      },
+      "description": "Generate presence detected event when motion is detected"
+    },
+    {
+      "inputs": ["property.hvacPower", "property.windows"],
+      "outputs": ["action.closeWindows"],
+      "conditional": {
+        "eval_exp": "property.hvacPower > 2 && property.windows == 'open'",
+        "value": true
+      },
+      "description": "Trigger close windows action when HVAC is running at high power and windows are open"
     }
   ]
 }
