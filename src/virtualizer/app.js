@@ -95,9 +95,7 @@ let currentValues = {};
  * @returns {Promise<void>}
  */
 async function applyBehavior() {
-    try {
-        const previousValues = { ...currentValues };
-        
+    try {       
         if (Object.keys(currentValues).length === 0) {
             currentValues = { ...affordance.default_values };
         }
@@ -206,10 +204,6 @@ async function applyBehavior() {
             }
         }
 
-        if (currentValues["property.fire"] === true) {
-            console.log("Fire detected! Taking appropriate actions...");
-        }
-
     } catch (error) {
         console.error("Error applying behavior:", error);
     }
@@ -257,12 +251,11 @@ function startVirtualizer() {
     
     logListBehaviorsStatus();
     
-    // Begin regular behavior application without running tests
     setInterval(() => {
         applyBehavior();
     }, interval);
     
-    console.log(`Virtualizer is running. Press Ctrl+C to stop.`);
+    console.log(`Virtualizer is running`);
 }
 
 startVirtualizer();
