@@ -5,25 +5,63 @@ const Behavior = require("./model");
 const affordance = require("./affordance.json");
 const axios = require("axios");
 
+// Define a custom string equality function for the math scope
+const customMathScope = {
+    stringEquals: function(a, b) {
+        return String(a) === String(b);
+    }
+};
+
 /**
  * Replaces dot notation in expressions with mathjs compatible object access syntax
+ * and handles string comparisons for mathjs compatibility
  * @param {string} expression - Expression with dot notation like "property.temperature * 1.5"
  * @returns {string} Expression with proper mathjs syntax
  */
 function preprocessExpression(expression) {
-    const matches = expression.match(/[a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_.]*/g) || [];
+    // Handle boolean literals for proper mathjs evaluation
+    let processedExp = expression
+        .replace(/\btrue\b/g, 'true')
+        .replace(/\bfalse\b/g, 'false');
     
-    let processedExpression = expression;
+    // Replace string equality comparisons with our custom stringEquals function
+    // Match pattern: something == 'string' or 'string' == something
+    const stringEqualityRegex = /([a-zA-Z_][a-zA-Z0-9_\[\]'\.]*)\s*==\s*['"]([^'"]*)['"]/g;
+    const reverseStringEqualityRegex = /['"]([^'"]*)['"]\s*==\s*([a-zA-Z_][a-zA-Z0-9_\[\]'\.]*)/g;
+    
+    processedExp = processedExp
+        .replace(stringEqualityRegex, "stringEquals($1, '$2')")
+        .replace(reverseStringEqualityRegex, "stringEquals('$1', $2)");
+    
+    const matches = processedExp.match(/[a-zA-Z_][a-zA-Z0-9_]*\.[a-zA-Z_][a-zA-Z0-9_.]*/g) || [];
+    
     for (const match of matches) {
         const parts = match.split('.');
         let replacement = parts[0];
         for (let i = 1; i < parts.length; i++) {
             replacement += `['${parts[i]}']`;
         }
-        processedExpression = processedExpression.replace(match, replacement);
+        processedExp = processedExp.replace(match, replacement);
     }
     
-    return processedExpression;
+    return processedExp;
+}
+
+/**
+ * Safely evaluates a math expression with the given scope
+ * @param {string} expression - The expression to evaluate
+ * @param {object} scope - The variables scope for evaluation
+ * @returns {any} The evaluated result or null if evaluation fails
+ */
+function safeEvaluate(expression, scope) {
+    try {
+        // Merge the custom math functions with the provided scope
+        const evaluationScope = { ...customMathScope, ...scope };
+        return math.evaluate(expression, evaluationScope);
+    } catch (error) {
+        console.error(`Failed to evaluate expression "${expression}": ${error.message}`);
+        return null;
+    }
 }
 
 /**
@@ -118,27 +156,93 @@ async function applyBehavior() {
             const output = outputs[0];
 
             if (behavior.map) {
-                result[output] = behavior.map.value;
+                if (behavior.map.property_path && inputs.length > 0) {
+                    // Extract the first input as the source object
+                    const sourceInput = inputs[0];
+                    const sourceValue = currentValues[sourceInput];
+                    
+                    // Parse the property_path
+                    const propertyPath = behavior.map.property_path.split('.');
+                    
+                    // Check if property_path starts with the same prefix as the input
+                    if (propertyPath[0] === sourceInput.split('.')[0] && 
+                        propertyPath[1] === sourceInput.split('.')[1]) {
+                        
+                        // This is accessing a nested property of the input
+                        // Remove the common prefix parts to get just the nested path
+                        const nestedPath = propertyPath.slice(2);
+                        
+                        if (sourceValue && typeof sourceValue === 'object') {
+                            let nestedValue = sourceValue;
+                            
+                            // Navigate through the nested structure
+                            for (const prop of nestedPath) {
+                                if (nestedValue && nestedValue.hasOwnProperty(prop)) {
+                                    nestedValue = nestedValue[prop];
+                                } else {
+                                    nestedValue = undefined;
+                                    break;
+                                }
+                            }
+                            
+                            if (nestedValue !== undefined) {
+                                result[output] = nestedValue;
+                            } else {
+                                console.warn(`Could not find nested property '${nestedPath.join('.')}' in input ${sourceInput}`);
+                                result[output] = behavior.map.value || null;
+                            }
+                        } else {
+                            console.warn(`Input ${sourceInput} is not an object or is undefined`);
+                            result[output] = behavior.map.value || null;
+                        }
+                    }
+                    // Check if it's a direct reference to another property in currentValues
+                    else if (currentValues.hasOwnProperty(behavior.map.property_path)) {
+                        result[output] = currentValues[behavior.map.property_path];
+                    } 
+                    else {
+                        console.warn(`Could not resolve property_path '${behavior.map.property_path}'`);
+                        result[output] = behavior.map.value || null;
+                    }
+                } else {
+                    // Original behavior - use the direct map value
+                    result[output] = behavior.map.value;
+                }
             } else if (behavior.list) {
                 result[output] = behavior.list.values[behavior.list.index];
             } else if (behavior.arithmeticExpression) {
                 const processedExpression = preprocessExpression(behavior.arithmeticExpression.eval_exp);
+                const nestedScope = convertToNestedObject(currentValues);
                 
-                try {
-                    const computedValue = math.evaluate(processedExpression, convertToNestedObject(currentValues));
+                const computedValue = safeEvaluate(processedExpression, nestedScope);
+                if (computedValue !== null) {
                     result[output] = computedValue;
-                } catch (evalError) {
-                    console.error(`Failed to evaluate expression: ${evalError.message}`);
                 }
             } else if (behavior.conditional) {
                 const processedExpression = preprocessExpression(behavior.conditional.eval_exp);
+                const nestedScope = convertToNestedObject(currentValues);
                 
-                try {
-                    if (math.evaluate(processedExpression, convertToNestedObject(currentValues))) {
+                // Add debug logging to help troubleshoot
+                console.log(`Evaluating condition: ${processedExpression}`);
+                console.log(`With scope:`, JSON.stringify(nestedScope));
+                
+                // First, evaluate the main condition
+                const conditionMet = safeEvaluate(processedExpression, nestedScope);
+                console.log(`Condition met: ${conditionMet}`);
+                
+                if (conditionMet) {
+                    // Check if there's an additional condition that also needs to be met
+                    if (behavior.conditional.additional_condition) {
+                        const additionalExpression = preprocessExpression(behavior.conditional.additional_condition);
+                        const additionalConditionMet = safeEvaluate(additionalExpression, nestedScope);
+                        
+                        if (additionalConditionMet) {
+                            result[output] = behavior.conditional.value;
+                        }
+                    } else {
+                        // No additional condition, just apply the value
                         result[output] = behavior.conditional.value;
                     }
-                } catch (evalError) {
-                    console.error(`Failed to evaluate conditional: ${evalError.message}`);
                 }
             } else if (behavior.distribution) {
                 if (behavior.distribution.type === "normal") {
@@ -229,6 +333,47 @@ function updateListIndices() {
 }
 
 /**
+ * Uploads all default values to the database if they don't exist yet
+ * @returns {Promise<void>}
+ */
+async function uploadDefaultValues() {
+  try {
+    if (!affordance.default_values || Object.keys(affordance.default_values).length === 0) {
+      console.log("No default values defined in affordance config");
+      return;
+    }
+
+    console.log("Checking if default values need to be uploaded to database...");
+    
+    // For each default value, check if it exists in the database
+    for (const [property, value] of Object.entries(affordance.default_values)) {
+      // Query to check if this property already has values in the database
+      const existingRecord = await Behavior.findOne({
+        device: affordance.thing_id,
+        interaction: property
+      });
+
+      // If no record exists, upload the default value
+      if (!existingRecord) {
+        console.log(`Uploading default value for property: ${property}`);
+        const dataToInsert = new Behavior({
+          data: { [property]: value },
+          device: affordance.thing_id,
+          interaction: property,
+          origin: "virtualDevice_default"
+        });
+
+        await dataToInsert.save();
+      }
+    }
+    
+    console.log("Default values check complete");
+  } catch (error) {
+    console.error("Error uploading default values:", error);
+  }
+}
+
+/**
  * Logs the current status of all list behaviors in the affordance
  * Including their properties, available values, and current index
  */
@@ -249,13 +394,24 @@ function startVirtualizer() {
     
     console.log(`Starting virtualizer with interval of ${interval}ms`);
     
-    logListBehaviorsStatus();
-    
-    setInterval(() => {
-        applyBehavior();
-    }, interval);
-    
-    console.log(`Virtualizer is running`);
+    uploadDefaultValues().then(() => {
+        logListBehaviorsStatus();
+        
+        setInterval(() => {
+            applyBehavior();
+        }, interval);
+        
+        console.log(`Virtualizer is running`);
+    }).catch(error => {
+        console.error("Failed to upload default values:", error);
+        logListBehaviorsStatus();
+        
+        setInterval(() => {
+            applyBehavior();
+        }, interval);
+        
+        console.log(`Virtualizer is running (without default values confirmation)`);
+    });
 }
 
 startVirtualizer();

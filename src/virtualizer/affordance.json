@@ -3,7 +3,7 @@
   "thing_id": "smartThermostat001",
   "thing_type": "thermostat",
   "description": "Sensor de temperatura, luz y movimiento",
-  "timings": 1000,
+  "timings": 10000,
   "default_values": {
     "property.temperature": 22.5,
     "property.humidity": 45,
@@ -12,8 +12,15 @@
     "property.lightLevel": 70,
     "property.outdoorTemperature": 25,
     "property.windows": "closed",
-    "property.hvacMode": "auto",
-    "property.timestamp": 1628097868
+    "property.thermostatStatus": {
+      "hvacMode": "auto",
+      "targetTemperature": 22.0,
+      "fanSpeed": "medium"
+    },
+    "property.timestamp": 1628097868,
+    "property.batteryStatus": "",
+    "property.batteryAlert": false,
+    "property.fire": false
   },
   "behaviour": [
     {
@@ -57,7 +64,7 @@
       "inputs": ["property.battery"],
       "outputs": ["property.batteryStatus"],
       "conditional": {
-        "eval_exp": "property.battery < 20",
+        "eval_exp": "20 >= property.battery",
         "value": "low"
       },
       "description": "Set battery status to 'low' when battery is below 20%"
@@ -66,7 +73,7 @@
       "inputs": ["property.battery"],
       "outputs": ["property.batteryAlert"],
       "conditional": {
-        "eval_exp": "property.battery < 10",
+        "eval_exp": "10 >= property.battery",
         "value": true
       },
       "description": "Trigger battery alert when battery is below 10%"
@@ -120,11 +127,20 @@
       "description": "Update timestamp with current time"
     },
     {
+      "inputs": ["property.thermostatStatus"],
+      "outputs": ["property.currentHvacMode"],
+      "map": {
+        "property_path": "property.thermostatStatus.hvacMode"
+      },
+      "description": "Extract hvacMode from nested thermostatStatus object"
+    },
+    {
       "inputs": ["property.temperature", "property.humidity"],
       "outputs": ["property.fire"],
       "conditional": {
-        "eval_exp": "property.temperature > 50 && property.humidity < 20",
-        "value": true
+        "eval_exp": "property.temperature >= 50",
+        "value": true,
+        "additional_condition": "property.humidity <= 20"
       },
       "description": "Detect potential fire conditions based on high temperature and low humidity"
     },
@@ -151,8 +167,9 @@
       "inputs": ["property.hvacPower", "property.windows"],
       "outputs": ["action.closeWindows"],
       "conditional": {
-        "eval_exp": "property.hvacPower > 2 && property.windows == 'open'",
-        "value": true
+        "eval_exp": "property.hvacPower >= 2",
+        "value": true,
+        "additional_condition": "property.windows == 'open'"
       },
       "description": "Trigger close windows action when HVAC is running at high power and windows are open"
     }
