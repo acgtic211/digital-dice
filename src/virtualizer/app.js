@@ -19,13 +19,10 @@ const customMathScope = {
  * @returns {string} Expression with proper mathjs syntax
  */
 function preprocessExpression(expression) {
-    // Handle boolean literals for proper mathjs evaluation
     let processedExp = expression
         .replace(/\btrue\b/g, 'true')
         .replace(/\bfalse\b/g, 'false');
     
-    // Replace string equality comparisons with our custom stringEquals function
-    // Match pattern: something == 'string' or 'string' == something
     const stringEqualityRegex = /([a-zA-Z_][a-zA-Z0-9_\[\]'\.]*)\s*==\s*['"]([^'"]*)['"]/g;
     const reverseStringEqualityRegex = /['"]([^'"]*)['"]\s*==\s*([a-zA-Z_][a-zA-Z0-9_\[\]'\.]*)/g;
     
@@ -157,25 +154,19 @@ async function applyBehavior() {
 
             if (behavior.map) {
                 if (behavior.map.property_path && inputs.length > 0) {
-                    // Extract the first input as the source object
                     const sourceInput = inputs[0];
                     const sourceValue = currentValues[sourceInput];
                     
-                    // Parse the property_path
                     const propertyPath = behavior.map.property_path.split('.');
                     
-                    // Check if property_path starts with the same prefix as the input
                     if (propertyPath[0] === sourceInput.split('.')[0] && 
                         propertyPath[1] === sourceInput.split('.')[1]) {
                         
-                        // This is accessing a nested property of the input
-                        // Remove the common prefix parts to get just the nested path
                         const nestedPath = propertyPath.slice(2);
                         
                         if (sourceValue && typeof sourceValue === 'object') {
                             let nestedValue = sourceValue;
                             
-                            // Navigate through the nested structure
                             for (const prop of nestedPath) {
                                 if (nestedValue && nestedValue.hasOwnProperty(prop)) {
                                     nestedValue = nestedValue[prop];
@@ -196,7 +187,6 @@ async function applyBehavior() {
                             result[output] = behavior.map.value || null;
                         }
                     }
-                    // Check if it's a direct reference to another property in currentValues
                     else if (currentValues.hasOwnProperty(behavior.map.property_path)) {
                         result[output] = currentValues[behavior.map.property_path];
                     } 
@@ -205,7 +195,6 @@ async function applyBehavior() {
                         result[output] = behavior.map.value || null;
                     }
                 } else {
-                    // Original behavior - use the direct map value
                     result[output] = behavior.map.value;
                 }
             } else if (behavior.list) {
@@ -222,16 +211,9 @@ async function applyBehavior() {
                 const processedExpression = preprocessExpression(behavior.conditional.eval_exp);
                 const nestedScope = convertToNestedObject(currentValues);
                 
-                // Add debug logging to help troubleshoot
-                console.log(`Evaluating condition: ${processedExpression}`);
-                console.log(`With scope:`, JSON.stringify(nestedScope));
-                
-                // First, evaluate the main condition
                 const conditionMet = safeEvaluate(processedExpression, nestedScope);
-                console.log(`Condition met: ${conditionMet}`);
                 
                 if (conditionMet) {
-                    // Check if there's an additional condition that also needs to be met
                     if (behavior.conditional.additional_condition) {
                         const additionalExpression = preprocessExpression(behavior.conditional.additional_condition);
                         const additionalConditionMet = safeEvaluate(additionalExpression, nestedScope);
@@ -240,7 +222,6 @@ async function applyBehavior() {
                             result[output] = behavior.conditional.value;
                         }
                     } else {
-                        // No additional condition, just apply the value
                         result[output] = behavior.conditional.value;
                     }
                 }
@@ -293,23 +274,32 @@ async function applyBehavior() {
             }
         }
 
-        for (const [property, value] of Object.entries(appliedChanges)) {
-            try {
-                const dataToInsert = new Behavior({
-                    data: { [property]: value },
-                    device: affordance.thing_id,
-                    interaction: property,
-                    origin: "virtualDevice"
-                });
-
-                await dataToInsert.save();
-            } catch (saveError) {
-                console.error(`Error saving to MongoDB: ${saveError.message}`);
-            }
-        }
+        await saveChangesToDatabase(appliedChanges);
 
     } catch (error) {
         console.error("Error applying behavior:", error);
+    }
+}
+
+/**
+ * Saves applied changes to the MongoDB database
+ * @param {object} changes - Object with property-value pairs to save
+ * @returns {Promise<void>}
+ */
+async function saveChangesToDatabase(changes) {
+    for (const [property, value] of Object.entries(changes)) {
+        try {
+            const dataToInsert = new Behavior({
+                data: { [property]: value },
+                device: affordance.thing_id,
+                interaction: property,
+                origin: "virtualDevice"
+            });
+
+            await dataToInsert.save();
+        } catch (saveError) {
+            console.error(`Error saving to MongoDB: ${saveError.message}`);
+        }
     }
 }
 
@@ -343,19 +333,13 @@ async function uploadDefaultValues() {
       return;
     }
 
-    console.log("Checking if default values need to be uploaded to database...");
-    
-    // For each default value, check if it exists in the database
     for (const [property, value] of Object.entries(affordance.default_values)) {
-      // Query to check if this property already has values in the database
       const existingRecord = await Behavior.findOne({
         device: affordance.thing_id,
         interaction: property
       });
 
-      // If no record exists, upload the default value
       if (!existingRecord) {
-        console.log(`Uploading default value for property: ${property}`);
         const dataToInsert = new Behavior({
           data: { [property]: value },
           device: affordance.thing_id,
@@ -366,8 +350,6 @@ async function uploadDefaultValues() {
         await dataToInsert.save();
       }
     }
-    
-    console.log("Default values check complete");
   } catch (error) {
     console.error("Error uploading default values:", error);
   }
@@ -392,16 +374,12 @@ function logListBehaviorsStatus() {
 function startVirtualizer() {
     const interval = affordance.timings;
     
-    console.log(`Starting virtualizer with interval of ${interval}ms`);
-    
     uploadDefaultValues().then(() => {
         logListBehaviorsStatus();
         
         setInterval(() => {
             applyBehavior();
         }, interval);
-        
-        console.log(`Virtualizer is running`);
     }).catch(error => {
         console.error("Failed to upload default values:", error);
         logListBehaviorsStatus();
@@ -409,8 +387,6 @@ function startVirtualizer() {
         setInterval(() => {
             applyBehavior();
         }, interval);
-        
-        console.log(`Virtualizer is running (without default values confirmation)`);
     });
 }
 
