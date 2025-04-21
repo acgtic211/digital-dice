@@ -1,51 +1,34 @@
-# Digital Dice Actualización
-## Adecuación a requisitos de SoftwareX
-### Cambios en el software
-1. [ ] Despliegue de mongoDB replicaset en Kubernetes (NO!!!, ver next).
-1. [x] Prueba con mongo atlas para facilitar el despliegue.
-2. [x] Establecimiento de configuración de infraestructura y artefactos Kubernetes
-3. [ ] Configuración de variables de entorno para Digital Dice en Kubernetes configmap. Incluida TD de dispositivo a manejar.
-4. [ ] Generación de secretos para Digital Dice en Kubernetes. Incluidos cerfificados SSL auto-firmados. Documentación de como generarlos y añadir excepciones en el navegador.
-5. [ ] Configuración de Ingress para Digital Dice en instalación local de Kubernetes.
-6. [ ] Establecimiento de rutas de manera automática a partir de la TD.
-7. [ ] Generación de comportamiento default para Digital Dice virtualizados en caso de que no haya virtualBehaviour.
-8. [ ] Generación de TD del Digital Dice automática a partir de la TD del dispositivo.
-9. [ ] Generación de OpenAPI a partir de la TD del Digital Dice.
-10. [ ] Establecimiento de UI en los ejemplos del repo.
-11. [ ] Establecimiento de 3 ejemplos (simpleLight, container, maletín) para desplegar en el repo. Los dos primeros virtualizados y el último no.
-12. [ ] Generación de documentación del repo.
-13. [x] Agregar licencia MIT al repo.
-14. [ ] Liberación del repo en GitHub.
-15. [ ] Redacción de publicación en SoftwareX. Cuidado limitaciones: 3000 palabras y 6 figuras max.
-16. [ ] Revisión de la publicación por parte de los autores.
-17. [ ] Envío de la publicación a SoftwareX.
+# Digital Dice
 
+## Table of contents
+**[Introduction](#introduction)**<br>
+**[Main features](#main-features)**<br>
+**[Installation](#installation)**<br>
+**[Usage](#usage)**<br>
+**[License](#license)**<br>
 
-## Requirements
+## Introduction
+Digital Dice is a microservice-based architecture that enables the virtual representation of physical devices —such as IoT devices or Cyber-Physical Systems (CPS)— to improve their integration, interoperability, and scalability. As the number of connected devices increases exponentially and the diversity of communication protocols becomes overwhelming, Digital Dice abstracts these complexities, providing a unified interface for users and developers.
 
-To execute the different scenarios, you need to have installed the following software:
+This approach aligns with the Web of Things (WoT) principles from the W3C and is designed to simplify development, improve performance under load, and enable safe testing environments through virtual replicas of physical systems. It provides a standardized, protocol-agnostic solution for modern IoT ecosystems.
 
+## Main features
+Digital Dice provides a modular, scalable framework that abstracts the interaction with physical devices through a collection of loosely coupled microservices. It handles communication, data persistence, event processing, and user interaction using RESTful APIs and real-time channels like Server-Sent Events (SSE). Core components like the Controller, Data Handler, and Reflection ensure connectivity, data management, and seamless protocol translation.
+
+Optional modules such as the User Interface, Event Handler, and Virtualizer add support for real-time visual dashboards, advanced event logic, and safe test environments without needing the physical hardware connected. Built-in support for message protocols (like MQTT) and semantic data formats (such as JSON-LD) allows devices to be integrated regardless of their underlying technology.
+
+Digital Dice also supports horizontal scaling and high availability, making it suitable for demanding scenarios like Smart Cities, Industry 4.0, or intelligent manufacturing systems.
+
+## Installation
+To install Digital Dice, you need to have the following software installed:
 1. Docker.
 2. Kubernetes.
-3. Free account of MongoAtlas. [https://www.mongodb.com/atlas](https://www.mongodb.com/atlas)
+3. A bash shell.
 
-## Replicating the scenario
-First you need to adjust the parameters inside the `.env.example` and rename them to `.env`. Then build the docker image for each of the components of the scenario. Those components are inside the folders:
-* Containers
-* Routes
-* Trucks
+After installing the required software, you need to adjust the parameters inside the `src.yaml` file.
 
-For each folder inside those folders, you need to create a docker image with the following naming pattern `dd-garbage-{nameOfTheThing}-{nameOfTheMicroservice}`, i.e., `dd-garbage-containers-controller`. To do so use the following command inside each of the microservices folders (where the dockerfile is located):
+## Usage
 
-```
-docker build -t dd-garbage-containers-controller
-```
-
-Once created the images for each of the microservices you need to run the following command inside the `k8s` folder for each `.yml` file insde the folder.
-
-```
-kubectl apply -f {nameOfTheThing}.yml
-```
 
 ## License
 MIT License

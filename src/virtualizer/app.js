@@ -2,10 +2,9 @@ require('./configdb');
 
 const math = require("mathjs");
 const Behavior = require("./model");
-const affordance = require("./affordance.json");
+const affordance = require("./affordanceLoader");
 const axios = require("axios");
 
-// Define a custom string equality function for the math scope
 const customMathScope = {
     stringEquals: function(a, b) {
         return String(a) === String(b);

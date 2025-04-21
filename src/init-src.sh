@@ -8,10 +8,6 @@ kubectl create secret generic tls-src \
 
 echo "##### INICIANDO YAML #####"
 
-cd ../virtualizer
-
-docker build -t manelme/digital-dice-virtualizer:0.1.0 .
-
 cd ..
 
 TD_PATH="./td.json"
@@ -21,6 +17,8 @@ if [ ! -f "$TD_PATH" ]; then
 else 
   kubectl create configmap td-config --from-file=td.json
 fi
+
+
 
 EVENTS_COUNT=$(grep -o '"events":' "$TD_PATH" | wc -l)
 
@@ -34,6 +32,15 @@ TYPE=$(grep -o '"@type":.*' "$TD_PATH" | sed 's/.*"@type"://g' | sed 's/[",]//g'
 if [ -n "$TYPE" ]; then
   if [ "$TYPE" = "virtual" ] || echo "$TYPE" | grep -q "virtual"; then
     echo "La Thing Description es de tipo 'virtual'. Lanzando la acción correspondiente."
+
+    AFFORDANCE_PATH="./affordance.json"
+    if [ ! -f "$AFFORDANCE_PATH" ]; then
+      echo "Error: No se encontró el archivo affordance.json"
+      exit 1
+    else 
+      kubectl create configmap affordance-config --from-file=affordance.json
+    fi
+
     kubectl apply -f src-virtualizer.yaml
   fi
 fi
