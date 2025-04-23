@@ -16,5 +16,5 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-EXPOSE 8065
+EXPOSE 8066
 CMD [ "node", "app.js" ]

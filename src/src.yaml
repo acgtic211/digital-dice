@@ -8,6 +8,7 @@ data:
   PORT_DH: "8063" # Port for the datahandler
   PORT_EH: "8064" # Port for the eventhandler
   PORT_VIRTUALIZER: "8065" # Port for the virtualizer
+  PORT_UI: "8066" # Port for the UI
   DEVICE_URI: "192.168.1.38" # IP address of the device
   DH: "https://src-dh-entrypoint" # Datahandler entrypoint
   EH: "https://src-eh-entrypoint" # Eventhandler entrypoint

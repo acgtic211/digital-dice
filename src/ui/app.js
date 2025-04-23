@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const switchComponent = require('./components/switch');
 const dimmerComponent = require('./components/dimmer');
+const spdy = require('spdy');
+const fs = require('fs');
 
 const app = express();
 
@@ -95,8 +97,8 @@ app.get('/multiple-components', (req, res) => {
 
 spdy.createServer(
   {
-      key: fs.readFileSync("/usr/src/app/certs/privkey.pem"),
-      cert: fs.readFileSync("/usr/src/app/certs/fullchain.pem")
+      key: fs.readFileSync("/app/certs/privkey.pem"),
+      cert: fs.readFileSync("/app/certs/fullchain.pem")
   },
   app
 ).listen(process.env.PORT_UI, (err) => {

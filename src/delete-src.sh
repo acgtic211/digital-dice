@@ -21,7 +21,10 @@ if [ -n "$TYPE" ]; then
   if [ "$TYPE" = "virtual" ] || echo "$TYPE" | grep -q "virtual"; then
     echo "La Thing Description es de tipo 'virtual'. Lanzando la acción correspondiente."
     kubectl delete -f src-virtualizer.yaml
+    kubectl delete configmap affordance-config
   fi
 fi
 
 kubectl delete secret tls-src
+
+kubectl delete -f src-ui.yaml 

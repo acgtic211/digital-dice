@@ -1,6 +1,8 @@
 # Digital Dice
 
-## Table of contents
+[![License MIT](https://img.shields.io/badge/License-MIT-lightgreen.svg)](https://opensource.org/licenses/MIT)
+
+### Table of contents
 **[Introduction](#introduction)**<br>
 **[Main features](#main-features)**<br>
 **[Installation](#installation)**<br>
@@ -26,6 +28,37 @@ To install Digital Dice, you need to have the following software installed:
 3. A bash shell.
 
 After installing the required software, you need to adjust the parameters inside the `src.yaml` file.
+
+The parameters are in the ConfigMap `src-config`. The parameters are:
+```yaml
+PORT_CONTROLLER: "443" # Port for the controller
+PORT2_CONTROLLER: "80" # Alternative port for the controller
+PORT_DH: "8063" # Port for the datahandler
+PORT_EH: "8064" # Port for the eventhandler
+PORT_VIRTUALIZER: "8065" # Port for the virtualizer
+DEVICE_URI: "192.168.1.38" # IP address of the device
+DH: "https://src-dh-entrypoint" # Datahandler entrypoint
+EH: "https://src-eh-entrypoint" # Eventhandler entrypoint
+DB_NAME: "dd-db" # Database name
+DB_USER: "dd_admin" # Database user
+DB_PASS: "123456admin" # Database password
+DB_URI: "mongodb://mongo-0.mongo-headless.default:27017,mongo-1.mongo-headless.default:27017,mongo-2.mongo-headless.default:27017/" # Database URI
+TD_O_URL: "https://example.com" # URL for the Thing Description
+```
+
+After adjusting the parameters, you can run the following command to deploy the database:
+```bash
+sh init-db.yaml
+```
+
+This command will create a MongoDB database with the name `dd-db` and the user `dd_admin` with the password `123456admin`. 
+
+> [!NOTE]
+> For access to the database is not required for the normal operation of the system, but if you want to access the database, you can use the following command:
+> ```bash
+> kubectl port-forward svc/mongo-headless 27018:27017
+> ```
+> This command will forward the port 27018 of your local machine to the port 27017 of the MongoDB service. > You can then access the database using the program of your choice, such as MongoDB Compass or DataGrip.
 
 ## Usage
 

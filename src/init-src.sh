@@ -46,3 +46,11 @@ if [ -n "$TYPE" ]; then
 fi
 
 kubectl apply -f src.yaml 
+
+cd ./ui
+
+docker build -t rrs999/digital-dice-ui:0.1.0 .
+
+cd ..
+
+kubectl apply -f src-ui.yaml 
