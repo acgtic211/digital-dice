@@ -33,12 +33,12 @@ if [ -n "$TYPE" ]; then
   if [ "$TYPE" = "virtual" ] || echo "$TYPE" | grep -q "virtual"; then
     echo "La Thing Description es de tipo 'virtual'. Lanzando la acción correspondiente."
 
-    AFFORDANCE_PATH="./affordance.json"
-    if [ ! -f "$AFFORDANCE_PATH" ]; then
-      echo "Error: No se encontró el archivo affordance.json"
+    BEHAVIOR_PATH="./behavior.json"
+    if [ ! -f "$BEHAVIOR_PATH" ]; then
+      echo "Error: No se encontró el archivo behavior.json"
       exit 1
     else 
-      kubectl create configmap affordance-config --from-file=affordance.json
+      kubectl create configmap behavior-config --from-file=behavior.json
     fi
 
     kubectl apply -f src-virtualizer.yaml

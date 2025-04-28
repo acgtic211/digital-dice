@@ -1,9 +1,9 @@
 const fs = require("fs");
 const path = require('path');
 
-const jsonFilePath = path.join('/app/affordance', 'affordance.json');
+const jsonFilePath = path.join('/app/behavior', 'behavior.json');
 
-let affordance;
+let behavior;
 
 try {
   // Comprueba si el archivo existe y tiene contenido antes de leerlo
@@ -21,9 +21,9 @@ try {
     process.exit(1);
   }
 
-  affordance = JSON.parse(data);
+  behavior = JSON.parse(data);
 
-  if (Object.keys(affordance).length === 0) {
+  if (Object.keys(behavior).length === 0) {
     console.error('Error: El contenido del TD está vacío');
     process.exit(1);
   }
@@ -33,9 +33,9 @@ try {
   process.exit(1);
 }
 
-if (!affordance) {
+if (!behavior) {
   console.error('Error: El TD es nulo o indefinido');
   process.exit(1);
 }
 
-module.exports = affordance;
+module.exports = behavior;

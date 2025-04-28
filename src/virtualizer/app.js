@@ -2,7 +2,7 @@ require('./configdb');
 
 const math = require("mathjs");
 const Behavior = require("./model");
-const affordance = require("./affordanceLoader");
+const beh = require("./behaviorLoader");
 const axios = require("axios");
 
 // Define a custom string equality function for the math scope
@@ -52,7 +52,6 @@ function preprocessExpression(expression) {
  */
 function safeEvaluate(expression, scope) {
     try {
-        // Merge the custom math functions with the provided scope
         const evaluationScope = { ...customMathScope, ...scope };
         return math.evaluate(expression, evaluationScope);
     } catch (error) {
@@ -124,7 +123,7 @@ async function callMlModel(url, data, headers = {}) {
 let currentValues = {};
 
 /**
- * Main function that applies all behaviors defined in the affordance
+ * Main function that applies all behaviors defined in the behavior configuration
  * Processes each behavior type (map, list, arithmetic, conditional, distribution, ML model)
  * and updates the current values and database
  * @returns {Promise<void>}
@@ -132,14 +131,14 @@ let currentValues = {};
 async function applyBehavior() {
     try {       
         if (Object.keys(currentValues).length === 0) {
-            currentValues = { ...affordance.default_values };
+            currentValues = { ...beh.default_values };
         }
         
         const appliedChanges = {};
 
         updateListIndices();
         
-        for (let behavior of affordance.behaviour) {
+        for (let behavior of beh.behaviour) {
             let result = {};
             
             const inputs = behavior.inputs || [];
@@ -291,7 +290,7 @@ async function saveChangesToDatabase(changes) {
         try {
             const dataToInsert = new Behavior({
                 data: { [property]: value },
-                device: affordance.thing_id,
+                device: beh.thing_id,
                 interaction: property,
                 origin: "virtualDevice"
             });
@@ -308,7 +307,7 @@ async function saveChangesToDatabase(changes) {
  * Increments each list's index and wraps back to 0 when reaching the end
  */
 function updateListIndices() {
-    const listBehaviors = affordance.behaviour.filter(b => b.list);
+    const listBehaviors = beh.behaviour.filter(b => b.list);
     
     if (listBehaviors.length === 0) {
         return;
@@ -328,21 +327,21 @@ function updateListIndices() {
  */
 async function uploadDefaultValues() {
   try {
-    if (!affordance.default_values || Object.keys(affordance.default_values).length === 0) {
-      console.log("No default values defined in affordance config");
+    if (!beh.default_values || Object.keys(beh.default_values).length === 0) {
+      console.log("No default values defined in behavior config");
       return;
     }
 
-    for (const [property, value] of Object.entries(affordance.default_values)) {
+    for (const [property, value] of Object.entries(beh.default_values)) {
       const existingRecord = await Behavior.findOne({
-        device: affordance.thing_id,
+        device: beh.thing_id,
         interaction: property
       });
 
       if (!existingRecord) {
         const dataToInsert = new Behavior({
           data: { [property]: value },
-          device: affordance.thing_id,
+          device: beh.thing_id,
           interaction: property,
           origin: "virtualDevice_default"
         });
@@ -356,11 +355,11 @@ async function uploadDefaultValues() {
 }
 
 /**
- * Logs the current status of all list behaviors in the affordance
+ * Logs the current status of all list behaviors in the behavior configuration
  * Including their properties, available values, and current index
  */
 function logListBehaviorsStatus() {
-    const listBehaviors = affordance.behaviour.filter(b => b.list);
+    const listBehaviors = beh.behaviour.filter(b => b.list);
     
     if (listBehaviors.length === 0) {
         return;
@@ -369,10 +368,10 @@ function logListBehaviorsStatus() {
 
 /**
  * Starts the virtualizer by initializing behaviors and setting up
- * the interval-based behavior application based on affordance timing
+ * the interval-based behavior application based on beh timing
  */
 function startVirtualizer() {
-    const interval = affordance.timings;
+    const interval = beh.timings;
     
     uploadDefaultValues().then(() => {
         logListBehaviorsStatus();

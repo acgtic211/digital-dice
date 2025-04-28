@@ -115,7 +115,7 @@ async function executeInteractions(){
             default:
                 break;
         } 
-        // 
+    
         // if(response.interaction in lastInteractionTime && response.createdAt.getTime()-lastInteractionTime[response.interaction]<2000) {
         //     if(interactions[response.interaction]) interactions[response.interaction].push(response)
         //     else{
