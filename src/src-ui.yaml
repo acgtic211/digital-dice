@@ -52,5 +52,5 @@ spec:
   - protocol: TCP
     port: 8066
     targetPort: 8066
-    nodePort: 30003
+    nodePort: 30009
   type: NodePort

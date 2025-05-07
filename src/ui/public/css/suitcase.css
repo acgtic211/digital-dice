@@ -1,66 +1,84 @@
-.suitcaseContainer {
-    display: flex;
-    height: 100%;
-    max-width: 1150px;
-  }
-
-.knxScenarioContainer {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border-radius: 12px;
-  }
-
-
-  .slidersContainer {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    margin-top: 3rem;
-    width: 100%;
-    gap: 40px;
-  }
-
-  .switchesContainer {
-    padding: 10px;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(200px, 1fr));
-    place-items: center;
-    width: 100%;
-  }
-
-  .switchC {
-    width: 140px; /* Tamaño fijo para los switchers */
-    height: 168px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    border-radius: 34px;
+body {
+  font-family: Arial, sans-serif;
 }
 
+.suitcaseContainer {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
 
-@media screen and (max-width: 768px) {
-    .suitcaseContainer {
-      gap: 20px;
-    }
+.knxScenarioContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.switchesContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.slidersContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.switchC {
+  margin: 10px;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.backLink {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.backLink a {
+  color: #333;
+  text-decoration: none;
+  padding: 10px 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.backLink a:hover {
+  background-color: #f0f0f0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.status-offline {
+  opacity: 0.8;
+  background-color: #f5a742 !important;
+}
+
+.switch-component[offline] {
+  opacity: 0.8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .suitcaseContainer {
+    padding: 15px;
+  }
   
-    .knxScenarioContainer {
-      padding: 1rem;
-    }
+  .switchesContainer {
+    flex-direction: column;
+  }
   
-    .slidersContainer {
-      gap: 20px;
-    }
-  
-    .switchesContainer {
-      grid-template-columns: repeat(1, minmax(200px, 1fr));
-      gap: 20px;
-    }
-  
-    .switchC {
-      width: 100%;
-      height: 168px;
-    }
-    
+  .slidersContainer {
+    flex-direction: column;
+  }
 }

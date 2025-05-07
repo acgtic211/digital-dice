@@ -1,18 +1,30 @@
 {
   "name": "ui",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A project showcasing various UI components including switches, dimmers, sliders, toggles, and buttons.",
+  "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "express": "^4.21.2",
-    "fs": "^0.0.1-security",
-    "path": "^0.12.7",
-    "spdy": "^4.0.2"
-  }
+    "express": "^4.17.1",
+    "mongoose": "^8.14.1",
+    "spdy": "^4.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  },
+  "keywords": [
+    "ui",
+    "components",
+    "express",
+    "dimmer",
+    "switch",
+    "slider",
+    "toggle",
+    "button"
+  ],
+  "author": "Ruth",
+  "license": "MIT"
 }
