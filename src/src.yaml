@@ -9,13 +9,13 @@ data:
   PORT_EH: "8064" # Port for the eventhandler
   PORT_VIRTUALIZER: "8065" # Port for the virtualizer
   PORT_UI: "8066" # Port for the UI
-  DEVICE_URI: "192.168.1.38" # IP address of the device
+  SUITCASE_URI: "192.168.1.17" # IP address of the device
   DH: "https://src-dh-entrypoint" # Datahandler entrypoint
   EH: "https://src-eh-entrypoint" # Eventhandler entrypoint
   DB_NAME: "dd-db" # Database name
   DB_USER: "dd_admin" # Database user
   DB_PASS: "123456admin" # Database password
-  DB_URI: "mongodb://mongo-0.mongo-headless.default:27017,mongo-1.mongo-headless.default:27017,mongo-2.mongo-headless.default:27017/"
+  DB_URI: "mongodb://192.168.1.2:27017/"
   TD_O_URL: "https://localhost:30001" # URL for the Thing Description
 ---
 apiVersion: apps/v1
