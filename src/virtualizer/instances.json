@@ -1,0 +1,62 @@
+{
+  "enableMultiInstance": true,
+  
+  "baseConfig": {
+    "instanceCount": 3,
+    "instanceIdPattern": "acg:lab:container:{id}"
+  },
+  
+  "instances": [
+    {
+      "id": "1",
+      "customDefaults": {
+        "location.value": "Downtown"
+      }
+    },
+    {
+      "id": "2",
+      "customDefaults": {
+        "location.value": "Suburb",
+        "capacity.value": 250
+      }
+    },
+    {
+      "id": "3",
+      "customDefaults": {
+        "location.value": "Industrial Zone",
+        "capacity.value": 500,
+        "garbageClass.value": "Industrial"
+      }
+    }
+  ],
+  
+  "thingGenerationRules": {
+    "acg:lab:container": {
+      "randomizeProperties": [
+        {
+          "property": "capacity.value",
+          "min": 100,
+          "max": 1000,
+          "distribution": "normal",
+          "mean": 300,
+          "standardDeviation": 150
+        },
+        {
+          "property": "garbageLevel.value",
+          "min": 0,
+          "max": 50
+        }
+      ],
+      "listProperties": [
+        {
+          "property": "location.value",
+          "values": ["Downtown", "Business District", "Residential Area", "Industrial Zone", "Park", "Harbor", "Airport"]
+        },
+        {
+          "property": "garbageClass.value",
+          "values": ["General", "Recyclable", "Organic", "Industrial", "Hazardous"]
+        }
+      ]
+    }
+  }
+}

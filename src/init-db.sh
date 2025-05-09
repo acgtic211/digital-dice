@@ -30,7 +30,7 @@ REPLICA_STATUS=$(kubectl exec mongo-0 -- mongosh --quiet --eval 'rs.status().mem
 
 while [[ "$REPLICA_STATUS" != "PRIMARY" ]]; do
     echo "El nodo aún no es PRIMARY, esperando..."
-    sh delete-mongo.sh
+    sh delete-db.sh
     sleep 10
     sh init-db.sh
     REPLICA_STATUS=$(kubectl exec mongo-0 -- mongosh --quiet --eval 'rs.status().members.find(m => m.self).stateStr')

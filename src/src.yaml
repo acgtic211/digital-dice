@@ -15,7 +15,7 @@ data:
   DB_NAME: "dd-db" # Database name
   DB_USER: "dd_admin" # Database user
   DB_PASS: "123456admin" # Database password
-  DB_URI: "mongodb://192.168.1.2:27017/"
+  DB_URI: "mongodb://mongo-0.mongo-headless.default:27017,mongo-1.mongo-headless.default:27017,mongo-2.mongo-headless.default:27017/"
   TD_O_URL: "https://localhost:30001" # URL for the Thing Description
 ---
 apiVersion: apps/v1

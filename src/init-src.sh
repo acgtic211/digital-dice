@@ -39,6 +39,9 @@ if [ -n "$TYPE" ]; then
       exit 1
     else 
       kubectl create configmap behavior-config --from-file=behavior.json
+      cd ./virtualizer
+      kubectl create configmap instances-config --from-file=instances.json
+      cd ..
     fi
 
     kubectl apply -f src-virtualizer.yaml

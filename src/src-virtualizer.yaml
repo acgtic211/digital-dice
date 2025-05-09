@@ -36,6 +36,9 @@ spec:
           - name: behavior-config
             mountPath: "/app/behavior"
             readOnly: true
+          - name: instances-config
+            mountPath: "/app/instances"
+            readOnly: true
       volumes:
         - name: tls-src
           secret:
@@ -46,6 +49,9 @@ spec:
         - name: behavior-config
           configMap:
             name: behavior-config
+        - name: instances-config
+          configMap:
+            name: instances-config
 ---
 apiVersion: v1
 kind: Service

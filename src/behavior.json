@@ -1,94 +1,100 @@
 {
-  "thing_id": "urn:dev:acg:lab:environment_sensor",
-  "timings": 5000,
+  "thing_id": "acg:lab:virtual-containers",
+  "timings": 10000,
   "default_values": {
-    "temperature": 21,
-    "light": 500,
-    "motion": false,
-    "battery": 100,
-    "fire": false,
-    "robberyDetected": false
+    "serialNumber": 1001,
+    "location": {
+      "lat": "40.416775",
+      "lng": "-3.703790"
+    },
+    "totalCapacity": 1000,
+    "capacity": 250,
+    "garbageClass": "general",
+    "temperature": 22,
+    "address": "Calle Principal 123",
+    "fireDetected": false,
+    "garbageCollected": false
   },
   "behaviour": [
     {
-      "description": "Temperature fluctuates slightly over time with normal distribution",
+      "description": "Capacity increases over time as people throw garbage",
+      "inputs": ["capacity", "totalCapacity"],
+      "outputs": ["capacity"],
+      "arithmeticExpression": {
+        "eval_exp": "capacity < totalCapacity ? capacity + Math.random() * 5 : capacity"
+      }
+    },
+    {
+      "description": "Temperature fluctuates slightly with normal distribution",
       "inputs": [],
       "outputs": ["temperature"],
       "distribution": {
         "type": "normal",
-        "mean": 21,
-        "standard_deviation": 1.5
+        "mean": 22,
+        "standard_deviation": 2
       }
     },
     {
-      "description": "Light level follows daily pattern using a list of values",
-      "inputs": [],
-      "outputs": ["light"],
-      "list": {
-        "values": [50, 100, 200, 350, 500, 650, 800, 950, 1000, 950, 850, 700, 550, 400, 300, 200, 100, 50],
-        "index": 0
-      }
-    },
-    {
-      "description": "Motion detection randomly activates and deactivates",
-      "inputs": [],
-      "outputs": ["motion"],
-      "list": {
-        "values": [false, false, false, false, true, true, false, false, false, true, false, false],
-        "index": 0
-      }
-    },
-    {
-      "description": "Battery level slowly decreases over time",
-      "inputs": ["battery"],
-      "outputs": ["battery"],
-      "arithmeticExpression": {
-        "eval_exp": "battery > 0 ? battery - 0.01 : 0"
-      }
-    },
-    {
-      "description": "Fire detection is triggered when temperature exceeds 35°C",
+      "description": "Fire is detected when temperature exceeds 50°C",
       "inputs": ["temperature"],
-      "outputs": ["fire"],
+      "outputs": ["fireDetected"],
       "conditional": {
-        "eval_exp": "temperature > 35",
+        "eval_exp": "temperature > 50",
         "value": true
       }
     },
     {
-      "description": "Fire detection is deactivated when temperature is below 35°C",
+      "description": "Fire is extinguished when temperature drops below 50°C",
       "inputs": ["temperature"],
-      "outputs": ["fire"],
+      "outputs": ["fireDetected"],
       "conditional": {
-        "eval_exp": "temperature <= 35",
+        "eval_exp": "temperature <= 50",
         "value": false
       }
     },
     {
-      "description": "Robbery detection is triggered when motion is detected during night time",
-      "inputs": ["motion", "light"],
-      "outputs": ["robberyDetected"],
-      "conditional": {
-        "eval_exp": "motion == true && light < 200",
-        "value": true
-      }
-    },
-    {
-      "description": "Robbery detection is reset when motion is no longer detected or it's daytime",
-      "inputs": ["motion", "light"],
-      "outputs": ["robberyDetected"],
-      "conditional": {
-        "eval_exp": "motion == false || light >= 200",
-        "value": false
-      }
-    },
-    {
-      "description": "Temperature raises when fire is detected",
-      "inputs": ["fire", "temperature"],
+      "description": "Temperature rises rapidly when fire is detected",
+      "inputs": ["fireDetected", "temperature"],
       "outputs": ["temperature"],
       "conditional": {
-        "eval_exp": "fire == true",
-        "value": 40
+        "eval_exp": "fireDetected == true",
+        "value": "temperature + 3"
+      }
+    },
+    {
+      "description": "Garbage collection occurs randomly (simulating truck collection)",
+      "inputs": [],
+      "outputs": ["garbageCollected"],
+      "list": {
+        "values": [false, false, false, false, false, false, false, false, false, true],
+        "index": 0
+      }
+    },
+    {
+      "description": "Container is emptied when garbage is collected",
+      "inputs": ["garbageCollected", "capacity"],
+      "outputs": ["capacity"],
+      "conditional": {
+        "eval_exp": "garbageCollected == true",
+        "value": 0
+      }
+    },
+    {
+      "description": "Reset garbageCollected flag after collection",
+      "inputs": ["garbageCollected", "capacity"],
+      "outputs": ["garbageCollected"],
+      "conditional": {
+        "eval_exp": "capacity == 0 && garbageCollected == true",
+        "value": false
+      }
+    },
+    {
+      "description": "Container capacity is affected by temperature - higher temperatures compact garbage",
+      "inputs": ["temperature", "capacity"],
+      "outputs": ["capacity"],
+      "conditional": {
+        "eval_exp": "temperature > 30 && temperature < 50",
+        "value": "capacity * 0.99"
       }
     }
   ]
