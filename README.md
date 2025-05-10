@@ -47,11 +47,11 @@ TD_O_URL: "https://example.com" # URL for the Thing Description
 ```
 
 > [!NOTE]
-> This parameter are example values. You need to adjust them according to your environment. The `DEVICE_URI` parameter is the IP address of the device you want to connect to. The `DB_URI` parameter is the URI of the MongoDB database, but if you user the script, this URI is fine. The `TD_O_URL` parameter is the URL for the Thing Description.
+> This parameter are example values. You need to adjust them according to your environment. The `DEVICE_URI` parameter is the IP address of the device you want to connect to. The `DB_URI` parameter is the URI of the MongoDB database, but if you use the script for the creation of the database, this URI is fine. The `TD_O_URL` parameter is the URL for the Thing Description.
 
 After adjusting the parameters, you can run the following command to deploy the database:
 ```bash
-sh init-db.yaml
+sh init-db.sh
 ```
 
 This command will create a MongoDB database with the name `dd-db` and the user `dd_admin` with the password `123456admin`. You can change the database name, user and password in the `init-db.sh` file, but remember to change the parameters in the `src.yaml` file too.
@@ -66,7 +66,7 @@ This command will create a MongoDB database with the name `dd-db` and the user `
 
 After deploying the database, you can run the following command to deploy the Digital Dice microservices:
 ```bash
-sh init-src.yaml
+sh init-src.sh
 ```
 
 This command will create the following services:
@@ -83,12 +83,12 @@ This command will create the following services:
 > [!IMPORTANT]
 > For delete the services, you can use the following command:
 > ```bash
-> sh delete-src.yaml
+> sh delete-src.sh
 > ```
 > This command will delete all the services created by the `init-src.yaml` command.
 > You can also delete the database using the following command:
 > ```bash
-> sh delete-db.yaml
+> sh delete-db.sh
 > ```
 > This command will delete the MongoDB database created by the `init-db.yaml` command.
 
