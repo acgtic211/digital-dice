@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: digital-dice-virtualizer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: digital-dice-virtualizer
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '443'
+      labels:
+        app: digital-dice-virtualizer
+    spec:
+      containers:
+      - name: digital-dice-virtualizer
+        image: manelme/digital-dice-virtualizer:0.1.0
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 100m
+        envFrom:
+          - configMapRef:
+              name: digital-dice-config
+        volumeMounts:
+          - name: tls-digital-dice
+            mountPath: "/app/certs"
+            readOnly: true
+          - name: td-config
+            mountPath: "/app/td"
+            readOnly: true
+          - name: behavior-config
+            mountPath: "/app/behavior"
+            readOnly: true
+      volumes:
+        - name: tls-digital-dice
+          secret:
+            secretName: tls-digital-dice
+        - name: td-config
+          configMap:
+            name: td-config
+        - name: behavior-config
+          configMap:
+            name: behavior-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: digital-dice-virtualizer-entrypoint
+spec:
+  selector:
+    app: digital-dice-virtualizer
+  ports:
+  - protocol: TCP
+    port: 8065
+    targetPort: 8065
+    nodePort: 30002
+  type: NodePort

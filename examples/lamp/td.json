@@ -1,0 +1,444 @@
+{
+    "@context": "https://www.w3.org/2019/wot/td/v1",
+    "@type": "virtual",
+    "id": "colorlight_1:acg:lab",
+    "title": "ACG Lab Color Light 1",
+    "description": "Color light in ACG Lab",
+    "properties": {
+        "alertProperty": {
+            "title": "Alert Properties",
+            "description": "Properties of the alert (different colors or light patterns)\n- select: Light that flashes in short time intervals\n- lselect: Light that flashes in time long intervals\n- stop: Light stop flashing, but is on\n- blink: Light will flash one time when you send a request\n- none: Light without any alert",
+            "type": "string",
+            "enum": ["lselect", "stop", "blink", "select", "none"],
+            "forms": [
+                {
+                    "href": "http://localhost:8063/colorlight_1:acg:lab/property/alertProperty",
+                    "contentType": "application/json"
+                }
+            ]
+        },
+        "brightness": {
+            "title": "Brightness Properties",
+            "description": "Brightness is intensity of the light [0 is off and 254 is full brightness]",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 254,
+            "forms": [
+                {
+                    "href": "http://localhost:8063/colorlight_1:acg:lab/property/brightness",
+                    "contentType": "application/json"
+                }
+            ]
+        },
+        "colorMode": {
+            "title": "Color Mode Properties",
+            "description": "Actual state of color mode of the light:\n- ct: Color Temperature\n- hs: Hue and Saturation\n- xy: XY Color Space",
+            "type": "string",
+            "enum": ["ct", "xy", "hs"],
+            "forms": [
+                {
+                    "href": "http://localhost:8063/colorlight_1:acg:lab/property/colorMode",
+                    "contentType": "application/json"
+                }
+            ]
+        },
+        "colorTemperature": {
+            "title": "Color Temperature Properties",
+            "description": "Color temperature (warmer and cooler spectrum) of the light. The lower the value, the warmer the color. The higher the value, the cooler the color.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65279,
+            "forms": [
+                {
+                    "href": "http://localhost:8063/colorlight_1:acg:lab/property/colorTemperature",
+                    "contentType": "application/json"
+                }
+            ]
+        },
+        "hue": {
+            "title": "Hue Properties",
+            "description": "Hue is the color gradient of the light (0-65535). 0 is red, 25500 is green and 46920 is blue",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535,
+            "forms": [
+                {
+                    "href": "http://localhost:8063/colorlight_1:acg:lab/property/hue",
+                    "contentType": "application/json"
+                }
+            ]
+        },
+        "status": {
+            "title": "State of the light [On / Off]",
+            "type": "boolean",
+            "description": "On/Off state of the light. On = true, Off = false",
+            "forms": [
+                {
+                    "href": "http://localhost:8063/colorlight_1:acg:lab/property/status",
+                    "contentType": "application/json"
+                }
+            ]
+        },
+        "reachable": {
+            "title": "Reachable Properties",
+            "type": "boolean",
+            "description": "Property that indicate if the light is reachable or not. Reachable = true, Not reachable = false",
+            "forms": [
+                {
+                    "op": [ "readproperty" ],
+                    "href": "http://localhost:8063/colorlight_1:acg:lab/property/reachable",
+                    "contentType": "application/json"
+                }
+            ]
+        },
+        "saturation": {
+            "title": "Saturation Properties",
+            "description": "Saturation is the amount of white light to mix with hue [0 is white and 254 is full color]",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 254,
+            "forms": [
+                {
+                    "href": "http://localhost:8063/colorlight_1:acg:lab/property/saturation",
+                    "contentType": "application/json"
+                }
+            ]
+        },
+        "xyColorSpace": {
+            "title": "XY Properties",
+            "description": "XY color space of the light. Pure red is [0.675, 0.322], pure green is [0.5, 1], pure blue is [0.167, 0.04]",
+            "type": "array",
+            "items": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+            },
+            "minItems": 2,
+            "maxItems": 2,
+            "forms": [
+                {
+                    "href": "http://localhost:8063/colorlight_1:acg:lab/property/xyColorSpace",
+                    "contentType": "application/json"
+                }
+            ]
+        },
+        "extraProperties": {
+            "title": "Extra properties for the light",
+            "description": "Set of properties that give more information about the light",
+            "type": "object",
+            "properties":{
+                "colorcapabilities": {
+                    "title": "Color Capabilities",
+                    "description": "Capabily of see all the color space",
+                    "type": "number"
+                },
+             
+                "etag": {
+                    "title": "ETag",
+                    "description": "Identifier that validates if the client has the latest version of the resource",
+                    "type": "string"
+                },
+                "hascolor": {
+                    "title": "Has Color",
+                    "description": "Whether the light has color",
+                    "type": "boolean"
+                },
+                "lastannounced": {
+                    "title": "Last Announced",
+                    "description": "Last time the light was announced",
+                    "type": "string"
+                },
+                "lastseen": {
+                    "title": "Last Seen",
+                    "description": "Last time the light was seen",
+                    "type": "string"
+                },
+                "manufacturername": {
+                    "title": "Manufacturer Name",
+                    "description": "Name of the manufacturer of the light",
+                    "type": "string"
+                },
+                "modelid": {
+                    "title": "Model ID",
+                    "description": "ID of the model of the light",
+                    "type": "string"
+                },
+                "name": {
+                    "title": "Name",
+                    "description": "Friendly name of the light",
+                    "type": "string"
+                },
+                "swversion": {
+                    "title": "Software Version",
+                    "description": "Version of the software",
+                    "type": "string"
+                },
+                "_type": {
+                    "title": "Type",
+                    "description": "Type of the light",
+                    "type": "string"
+                },
+                "uniqueid": {
+                    "title": "Unique ID",
+                    "description": "Unique ID of the light",
+                    "type": "string"
+                }
+            },
+            "required": [ ],
+            "forms": [
+                {
+                    "op": [ "readproperty" ],
+                    "href": "http://localhost:8063/colorlight_1:acg:lab/property/extra",
+                    "contentType": "application/json"
+                }
+            ]
+        }
+    },
+    "actions": {
+        "alert": {
+            "title": "Alert",
+            "description": "Alert with different colors or light patterns\n- select: Light that flashes in short time intervals\n- lselect: Light that flashes in time long intervals\n- stop: Light stop flashing, but is on\n- blink: Light will flash one time when you send a request\n- none: Light without any alert",
+            "input": {
+                "type": "object",
+                "properties": {
+                    "alertProperty": {
+                        "type": "string",
+                        "enum": ["none", "select", "lselect", "blink", "stop"]
+                    }
+                },
+                "required": ["alertProperty"]
+            },
+            "output": {
+                "type": "object",
+                "properties": {
+                    "alertProperty": {
+                        "type": "string",
+                        "enum": ["none", "select", "lselect", "blink", "stop"]
+                    }
+                },
+                "required": ["alertProperty"]
+            },
+            "forms": [
+                {
+                    "op": "invokeaction",
+                    "href": "http://localhost:8063/colorlight_1:acg:lab/action/alert",
+                    "contentType": "application/json"
+                }
+            ]
+        },
+        "setBrightness": {
+            "title": "Brightness",
+            "description": "Change intensity of the light [0 is off and 254 is full brightness]",
+            "input": {
+                "type":"object",
+                "properties": {
+                    "brightness": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 254
+                    }
+                },
+                "required": ["brightness"]
+            },
+            "output": {
+                "type": "object",
+                "properties": {
+                    "brightness": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 254
+                    }
+                },
+                "required": ["brightness"]
+            },
+            "forms": [
+                {
+                    "op": "invokeaction",
+                    "href": "http://localhost:8063/colorlight_1:acg:lab/action/setBrightness",
+                    "contentType": "application/json"
+                }
+            ]
+        },
+        "setColorTemperature": {
+            "title": "Color Temperature",
+            "description": "Set color temperature (warmer and cooler spectrum) of the light. The lower the value, the warmer the color",
+            "input":{
+                "type": "object",
+                "properties": {
+                    "colorTemperature": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65279
+                    }
+                },
+                "required": ["colorTemperature"]
+            },
+            "output": {
+                "type": "object",
+                "properties": {
+                    "colorTemperature": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65279
+                    }
+                },
+                "required": ["colorTemperature"]
+            },
+            "forms": [
+                {
+                    "op": "invokeaction",
+                    "href": "http://localhost:8063/colorlight_1:acg:lab/action/setColorTemperature",
+                    "contentType": "application/json"
+                }
+            ]
+        },
+        "setHue": {
+            "title": "Hue",
+            "description": "Set hue (color gradient). 0 is red, 25500 is green, 46920 is blue",
+            "input": {
+                "type": "object",
+                "properties": {
+                    "hue": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65279
+                    }
+                },
+                "required": ["hue"]
+            },
+            "output": {
+                "type": "object",
+                "properties": {
+                    "hue": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65279
+                    }
+                },
+                "required": ["hue"]
+            },
+            "forms": [
+                {
+                    "op": "invokeaction",
+                    "href": "http://localhost:8063/colorlight_1:acg:lab/action/setHue",
+                    "contentType": "application/json"
+                }
+            ]
+        },
+        "setStatus": {
+            "title": "On/Off Action",
+            "description": "Turn on or off the light. On = true, Off = false",
+            "input":{
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "boolean"
+                    }
+                },
+                "required": ["status"]
+            },
+            "output": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "boolean"
+                    }
+                },
+                "required": ["status"]
+            },
+            "forms": [
+                {
+                    "op": "invokeaction",
+                    "href": "http://localhost:8063/colorlight_1:acg:lab/action/setStatus",
+                    "contentType": "application/json"
+                }
+            ]
+        },
+        "setSaturation": {
+            "title": "Saturation Action",
+            "description": "Set saturation (amount of white light to mix with hue) [0 is white and 254 is full color]",
+            "input": {
+                "type": "object",
+                "properties": {
+                    "saturation": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 254
+                    }
+                },
+                "required": ["saturation"]
+            },
+            "output": {
+                "type": "object",
+                "properties": {
+                    "saturation": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 254
+                    }
+                },
+                "required": ["saturation"]
+            },
+            "forms": [
+                {
+                    "op": "invokeaction",
+                    "href": "http://localhost:8063/colorlight_1:acg:lab/action/setSaturation",
+                    "contentType": "application/json"
+                }
+            ]
+        },
+        "setXYColorSpace": {
+            "title": "XY Action",
+            "description": "Set XY color space of the light. Pure red is [0.675, 0.322], pure green is [0.5, 1], pure blue is [0.167, 0.04]",
+            "input": {
+                "type": "object",
+                "properties": {
+                    "x": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                    },
+                    "y": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                    }
+                },
+                "required": ["x", "y"]
+            },
+            "output": {
+                "type": "object",
+                "properties": {
+                    "x": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                    },
+                    "y": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                    }
+                },
+                "required": ["x", "y"]
+            },
+            "forms": [
+                {
+                    "op": "invokeaction",
+                    "href": "http://localhost:8063/colorlight_1:acg:lab/action/setXYColorSpace",
+                    "contentType": "application/json"
+                }
+            ]
+        }
+    },
+    "events": {
+    },
+    "links": [
+    ],
+    "security": "nosec_sc",
+    "securityDefinitions": {
+        "nosec_sc": {
+            "scheme": "nosec"
+        }
+    }
+}

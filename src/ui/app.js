@@ -3,6 +3,7 @@ const path = require('path');
 const containerCardComponent = require('./components/containerCard');
 const switchComponent = require('./components/switch');
 const dimmerComponent = require('./components/dimmer');
+const colorLightComponent = require('./components/colorLight');
 
 const spdy = require('spdy');
 const fs = require('fs');
@@ -79,12 +80,41 @@ app.get('/', (req, res) => {
         <div class="menu">
           <a href="/suitcase" class="menu-item">Suitcase Controls</a>
           <a href="/containers" class="menu-item">Containers Dashboard</a>
+          <a href="/colorlight" class="menu-item">Smart Color Light</a>
           <a href="/api-test" class="menu-item">API Testing</a>
         </div>
       </body>
     </html>
   `);
 });
+
+app.get('/colorlight', (req, res) => {
+  const lightId = req.query.id || "colorlight_1:acg:lab";
+  const baseUrl = req.query.baseUrl || "http://localhost:8063";
+  
+  // Usar el componente ColorLight
+  const component = colorLightComponent(lightId, baseUrl);
+  
+  res.send(`
+    <html>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Smart Color Light Control</title>
+        <link rel="stylesheet" type="text/css" href="/css/colorLight.css">
+      </head>
+      <body>
+        <div class="page-header">
+          <h1>Smart Color Light Control</h1>
+        </div>
+        ${component}
+        <div class="back-link">
+          <a href="/">Back to Home</a>
+        </div>
+      </body>
+    </html>
+  `);
+});
+
 
 // Actualizar la ruta /switch
 app.get('/switch', (req, res) => {

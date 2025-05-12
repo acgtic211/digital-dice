@@ -1,0 +1,167 @@
+{
+  "thing_id": "colorlight_1:acg:lab",
+  "timings": 1000,
+  "default_values": {
+    "alertProperty": "none",
+    "brightness": 127,
+    "colorMode": "hs",
+    "colorTemperature": 4500,
+    "hue": 21845,
+    "status": true,
+    "reachable": true,
+    "saturation": 127,
+    "xyColorSpace": [0.5, 0.5],
+    "blinkCounter": 0,
+    "alertCounter": 0,
+    "extraProperties": {
+      "colorcapabilities": 31,
+      "etag": "1234abcd",
+      "hascolor": true,
+      "lastannounced": "2025-05-12T10:00:00Z",
+      "lastseen": "2025-05-12T12:00:00Z",
+      "manufacturername": "Digital Dice",
+      "modelid": "DD-ColorLight1",
+      "name": "ACG Lab Color Light 1",
+      "swversion": "1.0.0",
+      "_type": "Extended color light",
+      "uniqueid": "00:11:22:33:44:55:66:77-88"
+    }
+  },
+  "behaviour": [
+    {
+      "description": "Handle 'blink' alert pattern",
+      "inputs": ["alertProperty", "blinkCounter", "status"],
+      "outputs": ["status", "blinkCounter"],
+      "conditional": {
+        "eval_exp": "alertProperty === 'blink' && blinkCounter < 2",
+        "value": {
+          "status": "blinkCounter % 2 === 0 ? false : true",
+          "blinkCounter": "blinkCounter + 1"
+        }
+      }
+    },
+    {
+      "description": "Reset blink alert after completion",
+      "inputs": ["alertProperty", "blinkCounter"],
+      "outputs": ["alertProperty", "blinkCounter"],
+      "conditional": {
+        "eval_exp": "alertProperty === 'blink' && blinkCounter >= 2",
+        "value": {
+          "alertProperty": "none",
+          "blinkCounter": 0
+        }
+      }
+    },
+    {
+      "description": "Handle 'select' alert pattern (fast flashing)",
+      "inputs": ["alertProperty", "alertCounter"],
+      "outputs": ["status", "alertCounter"],
+      "conditional": {
+        "eval_exp": "alertProperty === 'select'",
+        "value": {
+          "status": "alertCounter % 2 === 0",
+          "alertCounter": "(alertCounter + 1) % 2"
+        }
+      }
+    },
+    {
+      "description": "Handle 'lselect' alert pattern (slow flashing)",
+      "inputs": ["alertProperty", "alertCounter"],
+      "outputs": ["status", "alertCounter"],
+      "conditional": {
+        "eval_exp": "alertProperty === 'lselect'",
+        "value": {
+          "status": "alertCounter % 4 < 2",
+          "alertCounter": "(alertCounter + 1) % 4"
+        }
+      }
+    },
+    {
+      "description": "Ensure light stays on with 'stop' alert",
+      "inputs": ["alertProperty"],
+      "outputs": ["status"],
+      "conditional": {
+        "eval_exp": "alertProperty === 'stop'",
+        "value": true
+      }
+    },
+    {
+      "description": "Set color mode to 'ct' when color temperature is changed",
+      "inputs": ["colorTemperature"],
+      "outputs": ["colorMode"],
+      "conditional": {
+        "eval_exp": "true",
+        "value": "ct"
+      }
+    },
+    {
+      "description": "Set color mode to 'hs' when hue or saturation is changed",
+      "inputs": ["hue", "saturation"],
+      "outputs": ["colorMode"],
+      "conditional": {
+        "eval_exp": "true",
+        "value": "hs"
+      }
+    },
+    {
+      "description": "Set color mode to 'xy' when xy color space is changed",
+      "inputs": ["xyColorSpace"],
+      "outputs": ["colorMode"],
+      "conditional": {
+        "eval_exp": "true",
+        "value": "xy"
+      }
+    },
+    {
+      "description": "Simulate occasional connectivity issues",
+      "inputs": [],
+      "outputs": ["reachable"],
+      "conditional": {
+        "eval_exp": "Math.random() < 0.005",
+        "value": false
+      }
+    },
+    {
+      "description": "Recover from connectivity issues",
+      "inputs": ["reachable"],
+      "outputs": ["reachable"],
+      "conditional": {
+        "eval_exp": "reachable === false && Math.random() < 0.2",
+        "value": true
+      }
+    },
+    {
+      "description": "Synchronize XY color space with hue/saturation when in HS mode",
+      "inputs": ["hue", "saturation", "colorMode"],
+      "outputs": ["xyColorSpace"],
+      "conditional": {
+        "eval_exp": "colorMode === 'hs'",
+        "value": [
+          "0.5 + 0.3 * Math.cos(hue / 65535 * 2 * Math.PI)",
+          "0.5 + 0.3 * Math.sin(hue / 65535 * 2 * Math.PI) * (saturation / 254)"
+        ]
+      }
+    },
+    {
+      "description": "Synchronize hue/saturation with XY color space when in XY mode",
+      "inputs": ["xyColorSpace", "colorMode"],
+      "outputs": ["hue", "saturation"],
+      "conditional": {
+        "eval_exp": "colorMode === 'xy'",
+        "value": {
+          "hue": "Math.round(Math.atan2(xyColorSpace[1] - 0.5, xyColorSpace[0] - 0.5) / (2 * Math.PI) * 65535 + 65535) % 65535",
+          "saturation": "Math.min(254, Math.round(Math.sqrt(Math.pow(xyColorSpace[0] - 0.5, 2) + Math.pow(xyColorSpace[1] - 0.5, 2)) / 0.3 * 254))"
+        }
+      }
+    },
+    {
+      "description": "When light is turned off, brightness is preserved but light doesn't emit light",
+      "inputs": ["status", "brightness"],
+      "outputs": ["brightness"],
+      "conditional": {
+        "eval_exp": "status === false",
+        "value": "brightness"
+      }
+    }
+  ]
+}
