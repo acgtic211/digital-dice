@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dd-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dd-ui
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '443'
+      labels:
+        app: dd-ui
+    spec:
+      containers:
+      - name: dd-ui
+        image: rrs999/digital-dice-ui:0.1.0
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 100m
+        envFrom:
+          - configMapRef:
+              name: dd-config
+        volumeMounts:
+          - name: tls-dd
+            mountPath: "/app/certs"
+            readOnly: true
+          - name: td-config
+            mountPath: "/app/td"
+            readOnly: true
+      volumes:
+        - name: tls-dd
+          secret:
+            secretName: tls-dd
+        - name: td-config
+          configMap:
+            name: td-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dd-ui-entrypoint
+spec:
+  selector:
+    app: dd-ui
+  ports:
+  - protocol: TCP
+    port: 8066
+    targetPort: 8066
+    nodePort: 30009
+  type: NodePort

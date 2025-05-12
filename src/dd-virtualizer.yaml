@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dd-virtualizer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dd-virtualizer
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '443'
+      labels:
+        app: dd-virtualizer
+    spec:
+      containers:
+      - name: dd-virtualizer
+        image: rrs999/digital-dice-virtualizer:0.1.0
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 100m
+        envFrom:
+          - configMapRef:
+              name: dd-config
+        volumeMounts:
+          - name: tls-dd
+            mountPath: "/app/certs"
+            readOnly: true
+          - name: td-config
+            mountPath: "/app/td"
+            readOnly: true
+          - name: behavior-config
+            mountPath: "/app/behavior"
+            readOnly: true
+          - name: instances-config
+            mountPath: "/app/instances"
+            readOnly: true
+      volumes:
+        - name: tls-dd
+          secret:
+            secretName: tls-dd
+        - name: td-config
+          configMap:
+            name: td-config
+        - name: behavior-config
+          configMap:
+            name: behavior-config
+        - name: instances-config
+          configMap:
+            name: instances-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dd-virtualizer-entrypoint
+spec:
+  selector:
+    app: dd-virtualizer
+  ports:
+  - protocol: TCP
+    port: 8065
+    targetPort: 8065
+    nodePort: 30002
+  type: NodePort

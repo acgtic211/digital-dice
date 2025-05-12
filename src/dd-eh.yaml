@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dd-eh
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dd-eh
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: /metrics
+        prometheus.io/port: '443'
+      labels:
+        app: dd-eh
+    spec:
+      containers:
+      - name: dd-eh
+        image: manelme/digital-dice-eh:0.1.0
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 100m
+        envFrom:
+          - configMapRef:
+              name: dd-config
+        volumeMounts:
+          - name: tls-dd
+            mountPath: "/app/certs"
+            readOnly: true
+          - name: td-config
+            mountPath: "/app/td"
+            readOnly: true
+      volumes:
+        - name: tls-dd
+          secret:
+            secretName: tls-dd
+        - name: td-config
+          configMap:
+            name: td-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dd-eh-entrypoint
+spec:
+  selector:
+    app: dd-eh
+  ports:
+  - protocol: TCP
+    port: 8064
+    targetPort: 8064
+  type: ClusterIP
