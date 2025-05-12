@@ -22,7 +22,6 @@ if [ -n "$TYPE" ]; then
     echo "La Thing Description es de tipo 'virtual'. Lanzando la acción correspondiente."
     kubectl delete -f digital-dice-virtualizer.yaml
     kubectl delete configmap behavior-config
-    kubectl delete configmap instances-config
   fi
 fi
 

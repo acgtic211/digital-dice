@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dd-virtualizer
+  name: digital-dice-virtualizer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dd-virtualizer
+      app: digital-dice-virtualizer
   template:
     metadata:
       annotations:
@@ -14,10 +14,10 @@ spec:
         prometheus.io/path: /metrics
         prometheus.io/port: '443'
       labels:
-        app: dd-virtualizer
+        app: digital-dice-virtualizer
     spec:
       containers:
-      - name: dd-virtualizer
+      - name: digital-dice-virtualizer
         image: manelme/digital-dice-virtualizer:0.1.0
         imagePullPolicy: IfNotPresent
         resources:
@@ -25,9 +25,9 @@ spec:
             cpu: 100m
         envFrom:
           - configMapRef:
-              name: dd-config
+              name: digital-dice-config
         volumeMounts:
-          - name: tls-dd
+          - name: tls-digital-dice
             mountPath: "/app/certs"
             readOnly: true
           - name: td-config
@@ -36,30 +36,24 @@ spec:
           - name: behavior-config
             mountPath: "/app/behavior"
             readOnly: true
-          - name: instances-config
-            mountPath: "/app/instances"
-            readOnly: true
       volumes:
-        - name: tls-dd
+        - name: tls-digital-dice
           secret:
-            secretName: tls-dd
+            secretName: tls-digital-dice
         - name: td-config
           configMap:
             name: td-config
         - name: behavior-config
           configMap:
             name: behavior-config
-        - name: instances-config
-          configMap:
-            name: instances-config
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: dd-virtualizer-entrypoint
+  name: digital-dice-virtualizer-entrypoint
 spec:
   selector:
-    app: dd-virtualizer
+    app: digital-dice-virtualizer
   ports:
   - protocol: TCP
     port: 8065

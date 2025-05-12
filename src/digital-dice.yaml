@@ -14,7 +14,7 @@ data:
   EH: "https://digital-dice-eh-entrypoint" # Eventhandler entrypoint
   DB_NAME: "db_name" # Database name
   DB_USER: "db_user" # Database user
-  DB_PASS: "db_passsword" # Database password
+  DB_PASS: "db_password" # Database password
   DB_URI: "mongodb://mongo-0.mongo-headless.default:27017,mongo-1.mongo-headless.default:27017,mongo-2.mongo-headless.default:27017/"
   TD_O_URL: "https://localhost:30001" # URL for the Thing Description
 ---

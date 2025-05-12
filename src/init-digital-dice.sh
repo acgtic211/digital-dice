@@ -2,9 +2,7 @@ cd ./certs
 
 kubectl create secret generic tls-digital-dice \
   --from-file=privkey.pem=privkey.pem \
-  --from-file=fullchain.pem=fullchain.pem \
-  --from-file=server.crt=server.crt \
-  --from-file=server.key=server.key
+  --from-file=fullchain.pem=fullchain.pem
 
 echo "##### INICIANDO YAML #####"
 
@@ -39,9 +37,6 @@ if [ -n "$TYPE" ]; then
       exit 1
     else 
       kubectl create configmap behavior-config --from-file=behavior.json
-      cd ./virtualizer
-      kubectl create configmap instances-config --from-file=instances.json
-      cd ..
     fi
 
     kubectl apply -f digital-dice-virtualizer.yaml

@@ -43,23 +43,23 @@ echo "Creando la base de datos 'virtual-interactions' y el usuario..."
 kubectl exec mongo-0 -- mongosh --eval '
 db = db.getSiblingDB("virtual-interactions");
 db.createUser({
-  user: "virtual-user",
-  pwd: "123456virtual",
+  user: "dd-user",
+  pwd: "dd-password",
   roles: [ "readWrite", "dbAdmin" ]
 });
-db.virtualCollection.insertOne({ name: "primer documento" });
+db.virtualCollection.insertOne({ name: "delete_me" });
 ' 
 
 # Crear la base de datos 'dd-db' y el usuario
-echo "Creando la base de datos 'dd-db' y el usuario..."
+echo "Creando la base de datos 'db_name' y el usuario..."
 kubectl exec mongo-0 -- mongosh --eval '
-db = db.getSiblingDB("dd-db");
+db = db.getSiblingDB("db_name");
 db.createUser({
-  user: "dd_admin",
-  pwd: "123456admin",
+  user: "db_user",
+  pwd: "db_password",
   roles: [ "readWrite", "dbAdmin" ]
 });
-db.ddCollection.insertOne({ name: "primer documento" });
+db.ddCollection.insertOne({ name: "delete_me" });
 ' 
 
 echo "Proceso completado."
