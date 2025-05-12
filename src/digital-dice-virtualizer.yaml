@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dd-eh
+  name: dd-virtualizer
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dd-eh
+      app: dd-virtualizer
   template:
     metadata:
       annotations:
@@ -14,11 +14,11 @@ spec:
         prometheus.io/path: /metrics
         prometheus.io/port: '443'
       labels:
-        app: dd-eh
+        app: dd-virtualizer
     spec:
       containers:
-      - name: dd-eh
-        image: manelme/digital-dice-eh:0.1.0
+      - name: dd-virtualizer
+        image: manelme/digital-dice-virtualizer:0.1.0
         imagePullPolicy: IfNotPresent
         resources:
           limits:
@@ -33,6 +33,12 @@ spec:
           - name: td-config
             mountPath: "/app/td"
             readOnly: true
+          - name: behavior-config
+            mountPath: "/app/behavior"
+            readOnly: true
+          - name: instances-config
+            mountPath: "/app/instances"
+            readOnly: true
       volumes:
         - name: tls-dd
           secret:
@@ -40,16 +46,23 @@ spec:
         - name: td-config
           configMap:
             name: td-config
+        - name: behavior-config
+          configMap:
+            name: behavior-config
+        - name: instances-config
+          configMap:
+            name: instances-config
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: dd-eh-entrypoint
+  name: dd-virtualizer-entrypoint
 spec:
   selector:
-    app: dd-eh
+    app: dd-virtualizer
   ports:
   - protocol: TCP
-    port: 8064
-    targetPort: 8064
-  type: ClusterIP
+    port: 8065
+    targetPort: 8065
+    nodePort: 30002
+  type: NodePort

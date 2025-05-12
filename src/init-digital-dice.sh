@@ -1,6 +1,6 @@
 cd ./certs
 
-kubectl create secret generic tls-dd \
+kubectl create secret generic tls-digital-dice \
   --from-file=privkey.pem=privkey.pem \
   --from-file=fullchain.pem=fullchain.pem \
   --from-file=server.crt=server.crt \
@@ -23,7 +23,7 @@ fi
 EVENTS_COUNT=$(grep -o '"events":' "$TD_PATH" | wc -l)
 
 if [ "$EVENTS_COUNT" -gt 0 ]; then
-  kubectl apply -f dd-eh.yaml
+  kubectl apply -f digital-dice-eh.yaml
 else
   echo "La Thing Description no tiene eventos. No se lanzará el EventHandler."
 fi
@@ -44,16 +44,10 @@ if [ -n "$TYPE" ]; then
       cd ..
     fi
 
-    kubectl apply -f dd-virtualizer.yaml
+    kubectl apply -f digital-dice-virtualizer.yaml
   fi
 fi
 
-kubectl apply -f dd.yaml 
+kubectl apply -f digital-dice.yaml 
 
-cd ./ui
-
-docker build -t rrs999/digital-dice-ui:0.1.0 .
-
-cd ..
-
-kubectl apply -f dd-ui.yaml 
+kubectl apply -f digital-dice-ui.yaml 

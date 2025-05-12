@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dd-ui
+  name: digital-dice-eh
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dd-ui
+      app: digital-dice-eh
   template:
     metadata:
       annotations:
@@ -14,29 +14,29 @@ spec:
         prometheus.io/path: /metrics
         prometheus.io/port: '443'
       labels:
-        app: dd-ui
+        app: digital-dice-eh
     spec:
       containers:
-      - name: dd-ui
-        image: rrs999/digital-dice-ui:0.1.0
+      - name: digital-dice-eh
+        image: manelme/digital-dice-eh:0.1.0
         imagePullPolicy: IfNotPresent
         resources:
           limits:
             cpu: 100m
         envFrom:
           - configMapRef:
-              name: dd-config
+              name: digital-dice-config
         volumeMounts:
-          - name: tls-dd
+          - name: tls-digital-dice
             mountPath: "/app/certs"
             readOnly: true
           - name: td-config
             mountPath: "/app/td"
             readOnly: true
       volumes:
-        - name: tls-dd
+        - name: tls-digital-dice
           secret:
-            secretName: tls-dd
+            secretName: tls-digital-dice
         - name: td-config
           configMap:
             name: td-config
@@ -44,13 +44,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: dd-ui-entrypoint
+  name: digital-dice-eh-entrypoint
 spec:
   selector:
-    app: dd-ui
+    app: digital-dice-eh
   ports:
   - protocol: TCP
-    port: 8066
-    targetPort: 8066
-    nodePort: 30009
-  type: NodePort
+    port: 8064
+    targetPort: 8064
+  type: ClusterIP
