@@ -72,12 +72,12 @@ if (!valid) {
       if (td.properties.hasOwnProperty(prop)) {
         td.properties[prop].forms = [
           {
-            href: `${td.base}/${td.id}/properties/${prop}`,
+            href: `${td.base}/${td.id}/property/${prop}`,
             contentType: "application/json",
             op: ["readproperty", "writeproperty"],
           },
           {
-            href: `${td.base}/${td.id}/properties/${prop}/sse`,
+            href: `${td.base}/${td.id}/property/${prop}/sse`,
             contentType: "application/json",
             subprotocol: "sse",
             op: ["readproperty"],
