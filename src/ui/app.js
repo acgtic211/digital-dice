@@ -666,9 +666,9 @@ spdy.createServer(
     cert: fs.readFileSync("/app/certs/fullchain.pem")
   },
   app
-).listen(process.env.PORT_UI || 3000, (err) => {
+).listen(8066, (err) => {
   if(err){
     throw new Error(err);
   }
-  console.log("Listening on port " + (process.env.PORT_UI || 3000));
+  console.log("Listening on port " + (8066));
 });

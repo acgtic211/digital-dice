@@ -1,4 +1,5 @@
 kubectl delete -f digital-dice.yaml
+kubectl delete -f digital-dice-config.yaml
 
 TD_PATH="./td.json"
 # Verificar si el archivo td.json existe

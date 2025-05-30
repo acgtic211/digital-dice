@@ -6,8 +6,6 @@ const promBundle = require("express-prom-bundle");
 const fs = require("fs");
 const metricsMiddleware = promBundle({ includeMethod: true });
 const https = require("https");
-const http = require("http");
-const td = require('./tdLinkLoader');
 const routes = require("./routes");
 
 dotenv.config();
@@ -31,8 +29,8 @@ app.use(morgan("common"));
 
 app.use("/", routes);
 
-app.listen(process.env.PORT2_CONTROLLER, () => {
-  console.log("Controller listening on port ", process.env.PORT2_CONTROLLER);
+app.listen(80, () => {
+  console.log("Controller listening on port ", 80);
 });
 
 https
@@ -43,33 +41,10 @@ https
     },
     app
   )
-  .listen(process.env.PORT_CONTROLLER, (err) => {
+  .listen(443, (err) => {
     if (err) {
       throw new Error(err);
     }
-    console.log("Listening on port " + process.env.PORT_CONTROLLER);
+    console.log("Listening on port " + 443);
   });
 
-const options = {
-  hostname: "acg.ual.es",
-  path: "/projects/cosmart/wot-lab/ds/",
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-};
-
-const req = http.request(options, (res) => {
-  console.log(`statusCode: ${res.statusCode}`);
-
-  res.on("data", (d) => {
-    process.stdout.write(d);
-  });
-});
-
-req.on("error", (error) => {
-  console.error(error);
-});
-
-req.write(JSON.stringify(td));
-req.end();

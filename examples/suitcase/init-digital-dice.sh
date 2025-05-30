@@ -16,8 +16,6 @@ else
   kubectl create configmap td-config --from-file=td.json
 fi
 
-
-
 EVENTS_COUNT=$(grep -o '"events":' "$TD_PATH" | wc -l)
 
 if [ "$EVENTS_COUNT" -gt 0 ]; then
@@ -42,6 +40,8 @@ if [ -n "$TYPE" ]; then
     kubectl apply -f digital-dice-virtualizer.yaml
   fi
 fi
+
+kubectl apply -f digital-dice-config.yaml
 
 kubectl apply -f digital-dice.yaml 
 

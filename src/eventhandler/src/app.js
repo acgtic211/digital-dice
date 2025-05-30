@@ -26,6 +26,6 @@ app.use("/", routes);
 
 effectsControl();
 
-app.listen(process.env.PORT_EH, () => {
-    console.debug('App listening on port ' + process.env.PORT_EH);
+app.listen(8064, () => {
+    console.debug('App listening on port ' + 8064);
 });

@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: digital-dice-virtualizer
-        image: manelme/digital-dice-virtualizer:0.1.0
+        image: manelme/digital-dice-virtualizer:0.1.1
         imagePullPolicy: IfNotPresent
         resources:
           limits:
