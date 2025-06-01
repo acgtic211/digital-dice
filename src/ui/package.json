@@ -6,11 +6,9 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js"
-  },
-  "dependencies": {
+  },  "dependencies": {
     "express": "^4.17.1",
-    "mongoose": "^8.14.1",
-    "spdy": "^4.0.0"
+    "mongoose": "^8.14.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"

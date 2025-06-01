@@ -6,7 +6,7 @@ const fs = require("fs");
 const cors = require('cors');
 const metricsMiddleware = promBundle({includeMethod: true});
 
-const spdy = require("spdy");
+const http2 = require("http2");
 
 const routes = require("./routes");
 
@@ -32,10 +32,11 @@ app.use(morgan('common'));
 app.use("/", routes);
 
 // Initializates the Webserver
-spdy.createServer(
+http2.createSecureServer(
     {
         key: fs.readFileSync("/app/certs/privkey.pem"),
-        cert: fs.readFileSync("/app/certs/fullchain.pem")
+        cert: fs.readFileSync("/app/certs/fullchain.pem"),
+        allowHTTP1: true
     },
     app
   ).listen(8063, (err) => {

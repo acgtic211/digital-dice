@@ -3,7 +3,7 @@ const EventSource = require("eventsource");
 const request = require("request");
 const router = express.Router();
 const swaggerUi = require("swagger-ui-express");
-const { openAPISpec }= require("./swaggerConfig");
+const { openAPISpec } = require("./swaggerConfig");
 //const td = require('./tdLoader');
 const tdLink = require('./tdLoader');
 
@@ -15,12 +15,12 @@ router.get(`/${tdLink.id}/property/:propertyName/sse`, (req, res) => {
   var eventSourceInitDict = { https: { rejectUnauthorized: false } };
   var es = new EventSource(
     process.env.DH +
-      ":8063" +
-      "/" +
-      tdLink.id +
-      "/property/" +
-      req.params.propertyName +
-      "/sse",
+    ":8063" +
+    "/" +
+    tdLink.id +
+    "/property/" +
+    req.params.propertyName +
+    "/sse",
     eventSourceInitDict
   );
   //var es = new EventSource("https://localhost:8063"+"/"+td.id+"/property/"+req.params.propertyName+"/sse", eventSourceInitDict);
@@ -56,11 +56,11 @@ router.get(`/${tdLink.id}/property/:propertyName`, (req, res) => {
 
   request(
     process.env.DH +
-      ":8063" +
-      "/" +
-      tdLink.id +
-      "/property/" +
-      req.params.propertyName
+    ":8063" +
+    "/" +
+    tdLink.id +
+    "/property/" +
+    req.params.propertyName
   ).pipe(res);
   //request("https://localhost:8063"+"/"+td.id+"/property/"+req.params.propertyName).pipe(res);
 });
@@ -69,17 +69,17 @@ router.post(`/${tdLink.id}/property/:propertyName`, (req, res) => {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   if (!tdLink.properties[req.params.propertyName])
     res.status(404).send("That property doesn't exist");
-    if (tdLink.properties[req.params.propertyName].required) {
-      tdLink.properties[req.params.propertyName].required.forEach((element) => {
-        if (req.body[element] == undefined)
-          res
-            .status(404)
-            .send(
-              "Some of the necessary properties are not in the request - " +
-                tdLink.properties[req.params.propertyName].required
-            );
-      });
-    }
+  if (tdLink.properties[req.params.propertyName].required) {
+    tdLink.properties[req.params.propertyName].required.forEach((element) => {
+      if (req.body[element] == undefined)
+        res
+          .status(404)
+          .send(
+            "Some of the necessary properties are not in the request - " +
+            tdLink.properties[req.params.propertyName].required
+          );
+    });
+  }
 
   const headers = {
     "Content-Type": req.headers["content-type"],
@@ -96,11 +96,11 @@ router.post(`/${tdLink.id}/property/:propertyName`, (req, res) => {
     request
       .post(
         process.env.DH +
-          ":8063" +
-          "/" +
-          tdLink.id +
-          "/property/" +
-          req.params.propertyName,
+        ":8063" +
+        "/" +
+        tdLink.id +
+        "/property/" +
+        req.params.propertyName,
         { json: req.body, headers: { "Content-Type": req.headers["content-type"] } } // Enviar como JSON
       )
       .pipe(res);  // Responder con el contenido de la respuesta
@@ -109,11 +109,11 @@ router.post(`/${tdLink.id}/property/:propertyName`, (req, res) => {
     request
       .post(
         process.env.DH +
-          ":8063" +
-          "/" +
-          tdLink.id +
-          "/property/" +
-          req.params.propertyName,
+        ":8063" +
+        "/" +
+        tdLink.id +
+        "/property/" +
+        req.params.propertyName,
         { body: req.body, headers: { "Content-Type": req.headers["content-type"] } } // Enviar como texto plano
       )
       .pipe(res);  // Responder con el contenido de la respuesta
@@ -132,7 +132,7 @@ router.post(`/${tdLink.id}/action/:actionName`, (req, res) => {
         .status(404)
         .send(
           "Some of the necessary properties are not in the request - " +
-            tdLink.actions[req.params.actionName].required
+          tdLink.actions[req.params.actionName].required
         );
   });
 
@@ -149,11 +149,11 @@ router.post(`/${tdLink.id}/action/:actionName`, (req, res) => {
   request
     .post(
       process.env.DH +
-        ":8063" +
-        "/" +
-        tdLink.id +
-        "/action/" +
-        req.params.actionName,
+      ":8063" +
+      "/" +
+      tdLink.id +
+      "/action/" +
+      req.params.actionName,
       { json: req.body }
     )
     .pipe(res);

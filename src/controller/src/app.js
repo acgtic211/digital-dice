@@ -5,7 +5,7 @@ const cors = require("cors");
 const promBundle = require("express-prom-bundle");
 const fs = require("fs");
 const metricsMiddleware = promBundle({ includeMethod: true });
-const https = require("https");
+const http2 = require("http2");
 const routes = require("./routes");
 
 dotenv.config();
@@ -33,11 +33,12 @@ app.listen(80, () => {
   console.log("Controller listening on port ", 80);
 });
 
-https
-  .createServer(
+http2
+  .createSecureServer(
     {
       key: fs.readFileSync("/app/certs/privkey.pem"),
       cert: fs.readFileSync("/app/certs/fullchain.pem"),
+      allowHTTP1: true
     },
     app
   )

@@ -5,7 +5,7 @@ const switchComponent = require('./components/switch');
 const dimmerComponent = require('./components/dimmer');
 const colorLightComponent = require('./components/colorLight');
 
-const spdy = require('spdy');
+const http2 = require('http2');
 const fs = require('fs');
 
 const app = express();
@@ -660,10 +660,11 @@ app.get('/debug-response', (req, res) => {
 });
 
 // Inicia el servidor HTTPS
-spdy.createServer(
+http2.createSecureServer(
   {
     key: fs.readFileSync("/app/certs/privkey.pem"),
-    cert: fs.readFileSync("/app/certs/fullchain.pem")
+    cert: fs.readFileSync("/app/certs/fullchain.pem"),
+    allowHTTP1: true
   },
   app
 ).listen(8066, (err) => {
