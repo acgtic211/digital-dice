@@ -1,0 +1,111 @@
+{
+  "thing_id": "acg:lab:container",
+  "timings": 10000,
+  "default_values": {
+    "property.garbageLevel": 50,
+    "property.serialNumber": 1001,
+    "property.location": {
+      "lat": "40.416775",
+      "lng": "-3.703790"
+    },
+    "property.totalCapacity": 1000,
+    "property.capacity": 250,
+    "property.garbageClass": "general",
+    "property.temperature": 22,
+    "property.address": "Calle Principal 123",
+    "property.fireDetected": false,
+    "property.garbageCollected": false
+  },
+  "behaviour": [
+    {
+      "description": "Capacity increases over time as people throw garbage",
+      "inputs": ["property.capacity", "property.totalCapacity"],
+      "outputs": ["property.capacity"],
+      "arithmeticExpression": {
+        "eval_exp": "property.capacity < property.totalCapacity ? property.capacity + Math.random() * 5 : property.capacity"
+      }
+    },
+    {
+      "description": "Temperature fluctuates slightly with normal distribution",
+      "inputs": [],
+      "outputs": ["property.temperature"],
+      "distribution": {
+        "type": "normal",
+        "mean": 22,
+        "standard_deviation": 2
+      }
+    },
+    {
+      "inputs": [],
+      "outputs":["property.garbageLevel"],
+      "distribution": {
+        "type": "normal",
+        "mean": 30,
+        "standard_deviation": 3
+      }
+    },
+    {
+      "description": "Fire is detected when temperature exceeds 50°C",
+      "inputs": ["property.temperature"],
+      "outputs": ["property.fireDetected"],
+      "conditional": {
+        "eval_exp": "property.temperature > 50",
+        "value": true
+      }
+    },
+    {
+      "description": "Fire is extinguished when temperature drops below 50°C",
+      "inputs": ["property.temperature"],
+      "outputs": ["property.fireDetected"],
+      "conditional": {
+        "eval_exp": "temperature <= 50",
+        "value": false
+      }
+    },
+    {
+      "description": "Temperature rises rapidly when fire is detected",
+      "inputs": ["property.fireDetected", "property.temperature"],
+      "outputs": ["property.temperature"],
+      "conditional": {
+        "eval_exp": "property.fireDetected == true",
+        "value": "property.temperature + 3"
+      }
+    },
+    {
+      "description": "Garbage collection occurs randomly (simulating truck collection)",
+      "inputs": [],
+      "outputs": ["property.garbageCollected"],
+      "list": {
+        "values": [false, false, false, false, false, false, false, false, false, true],
+        "index": 0
+      }
+    },
+    {
+      "description": "Container is emptied when garbage is collected",
+      "inputs": ["property.garbageCollected", "property.capacity"],
+      "outputs": ["property.capacity"],
+      "conditional": {
+        "eval_exp": "property.garbageCollected == true",
+        "value": 0
+      }
+    },
+    {
+      "description": "Reset garbageCollected flag after collection",
+      "inputs": ["property.garbageCollected", "property.capacity"],
+      "outputs": ["property.garbageCollected"],
+      "conditional": {
+        "eval_exp": "property.capacity == 0 && property.garbageCollected == true",
+        "value": false
+      }
+    },
+    {
+      "description": "Container capacity is affected by temperature - higher temperatures compact garbage",
+      "inputs": ["property.temperature", "property.capacity"],
+      "outputs": ["property.capacity"],
+      "conditional": {
+        "eval_exp": "property.temperature > 30 && property.temperature < 50",
+        "value": "property.capacity * 0.99"
+      }
+    }
+  ]
+}

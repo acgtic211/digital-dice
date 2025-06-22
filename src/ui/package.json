@@ -1,0 +1,28 @@
+{
+  "name": "ui",
+  "version": "1.0.0",
+  "description": "A project showcasing various UI components including switches, dimmers, sliders, toggles, and buttons.",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^8.14.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  },
+  "keywords": [
+    "ui",
+    "components",
+    "express",
+    "dimmer",
+    "switch",
+    "slider",
+    "toggle",
+    "button"
+  ],
+  "author": "Ruth",
+  "license": "MIT"
+}

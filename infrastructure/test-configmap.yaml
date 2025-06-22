@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: dd-configmap
-data:
-  DB_URI: "mongodb+srv://<username>:<pass>@dd-cluster.qbhatbo.mongodb.net/dd-db?retryWrites=true&w=majority&appName=dd-cluster"

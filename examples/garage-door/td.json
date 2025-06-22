@@ -1,0 +1,113 @@
+{
+  "thing_id": "virtualgaragedoor:acg:lab",
+  "timings": 1000,
+  "default_values": {
+    "status": "CLOSED",
+    "percentageOpen": 0,
+    "targetPercentage": 0,
+    "isMoving": false,
+    "movementSpeed": 5,
+    "obstructionDetected": false
+  },
+  "behaviour": [
+    {
+      "description": "Update door movement when opening",
+      "inputs": ["percentageOpen", "targetPercentage", "isMoving"],
+      "outputs": ["percentageOpen"],
+      "conditional": {
+        "eval_exp": "isMoving && targetPercentage > percentageOpen",
+        "value": "Math.min(targetPercentage, percentageOpen + movementSpeed)"
+      }
+    },
+    {
+      "description": "Update door movement when closing",
+      "inputs": ["percentageOpen", "targetPercentage", "isMoving"],
+      "outputs": ["percentageOpen"],
+      "conditional": {
+        "eval_exp": "isMoving && targetPercentage < percentageOpen",
+        "value": "Math.max(targetPercentage, percentageOpen - movementSpeed)"
+      }
+    },
+    {
+      "description": "Stop movement when target percentage is reached",
+      "inputs": ["percentageOpen", "targetPercentage", "isMoving"],
+      "outputs": ["isMoving"],
+      "conditional": {
+        "eval_exp": "isMoving && percentageOpen === targetPercentage",
+        "value": false
+      }
+    },
+    {
+      "description": "Update status to OPEN when door is fully open",
+      "inputs": ["percentageOpen"],
+      "outputs": ["status"],
+      "conditional": {
+        "eval_exp": "percentageOpen >= 100",
+        "value": "OPEN"
+      }
+    },
+    {
+      "description": "Update status to CLOSED when door is fully closed",
+      "inputs": ["percentageOpen"],
+      "outputs": ["status"],
+      "conditional": {
+        "eval_exp": "percentageOpen <= 0",
+        "value": "CLOSED"
+      }
+    },
+    {
+      "description": "Update status to OPEN when door is partially open",
+      "inputs": ["percentageOpen"],
+      "outputs": ["status"],
+      "conditional": {
+        "eval_exp": "percentageOpen > 0 && percentageOpen < 100",
+        "value": "OPEN"
+      }
+    },
+    {
+      "description": "Random obstruction detection (1% chance)",
+      "inputs": ["isMoving", "percentageOpen"],
+      "outputs": ["obstructionDetected"],
+      "conditional": {
+        "eval_exp": "isMoving && percentageOpen > 0 && Math.random() < 0.01",
+        "value": true
+      }
+    },
+    {
+      "description": "Safety feature - stop movement when obstruction detected",
+      "inputs": ["obstructionDetected"],
+      "outputs": ["isMoving"],
+      "conditional": {
+        "eval_exp": "obstructionDetected",
+        "value": false
+      }
+    },
+    {
+      "description": "Clear obstruction after a few seconds",
+      "inputs": ["obstructionDetected"],
+      "outputs": ["obstructionDetected"],
+      "conditional": {
+        "eval_exp": "obstructionDetected && Math.random() < 0.2",
+        "value": false
+      }
+    },
+    {
+      "description": "When setStatus action is called with OPEN, set target to fully open",
+      "inputs": ["status"],
+      "outputs": ["targetPercentage", "isMoving"],
+      "conditional": {
+        "eval_exp": "status === 'OPEN' && percentageOpen < 100",
+        "value": { "targetPercentage": 100, "isMoving": true }
+      }
+    },
+    {
+      "description": "When setStatus action is called with CLOSED, set target to fully closed",
+      "inputs": ["status"],
+      "outputs": ["targetPercentage", "isMoving"],
+      "conditional": {
+        "eval_exp": "status === 'CLOSED' && percentageOpen > 0",
+        "value": { "targetPercentage": 0, "isMoving": true }
+      }
+    }
+  ]
+}
